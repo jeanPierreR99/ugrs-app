@@ -5,6 +5,7 @@ import DescriptionGarbage from "./DescriptionGarbage";
 import HeaderSearch from "./HeaderSearch";
 type VehicleStatus = "EN_RUTA" | "DETENIDO" | "FUERA_DE_SERVICIO";
 import dynamic from "next/dynamic";
+
 export interface Vehicle {
   id: number;
   code: string;
@@ -13,7 +14,6 @@ export interface Vehicle {
   route: string;
   status: VehicleStatus;
   speed: number;
-  progress: number;
   position: [number, number];
   routePath: any;
   updatedAt: number;
@@ -29,8 +29,7 @@ const VEHICLES: Vehicle[] = [
     route: "Sector 01 · Tambopata",
     status: "EN_RUTA",
     speed: 32,
-    progress: 68,
-    position: [-12.59773982729466, -69.18656766414644],
+    position: [-12.59409605234812, -69.18918281793596],
     routePath: [
       { lat: -12.59773982729466, lng: -69.18656766414644 },
       { lat: -12.594826382079084, lng: -69.18985873460771 },
@@ -56,7 +55,6 @@ const VEHICLES: Vehicle[] = [
     updatedAt: 8,
     color: "#448d20",
   },
-
   {
     id: 2,
     code: "CAM-002",
@@ -65,7 +63,6 @@ const VEHICLES: Vehicle[] = [
     route: "Sector 03 · Tambopata",
     status: "EN_RUTA",
     speed: 24,
-    progress: 42,
     position: [-12.602467233986184, -69.18628871440889],
     routePath: [
       { lat: -12.600846942177778, lng: -69.18478667736055 },
@@ -106,7 +103,6 @@ const VEHICLES: Vehicle[] = [
     updatedAt: 12,
     color: "#c13f3f",
   },
-
   {
     id: 3,
     code: "CAM-003",
@@ -115,8 +111,7 @@ const VEHICLES: Vehicle[] = [
     route: "Sector 05 · Puerto Maldonado",
     status: "EN_RUTA",
     speed: 0,
-    progress: 27,
-    position: [-12.605987865040687, -69.21212375164033],
+    position: [-12.603915, -69.209586],
     routePath: [
       { lat: -12.605987865040687, lng: -69.21212375164033 },
       { lat: -12.605652818220108, lng: -69.21274334192277 },
@@ -138,6 +133,26 @@ const VEHICLES: Vehicle[] = [
     ],
     updatedAt: 25,
     color: "#0c3e73",
+  },
+  {
+    id: 4,
+    code: "CAM-004",
+    plate: "EX-B2",
+    driver: "JEAN pIERRE",
+    route: "Sector 07 · La Joya",
+    status: "EN_RUTA",
+    speed: 12,
+    position: [-12.591936, -69.183092],
+    routePath: [
+      { lat: -12.590782056901809, lng: -69.1830486059189 },
+      { lat: -12.591431247375798, lng: -69.18367356061937 },
+      { lat: -12.592119701607565, lng: -69.18284207582475 },
+      { lat: -12.592227027005716, lng: -69.18291985988618 },
+      { lat: -12.591470512875972, lng: -69.18378084897996 },
+      { lat: -12.590685201730565, lng: -69.18302714824678 },
+    ],
+    updatedAt: 2,
+    color: "#e76a0e",
   },
 ];
 
@@ -219,6 +234,10 @@ export default function GarbageTracking() {
 
   const locateUser = () => {
     if (!navigator.geolocation) {
+      alert(
+        "La ubicación no está disponible en este dispositivo. " +
+          "Verifica que tu dispositivo y navegador sean compatibles.",
+      );
       return;
     }
 
@@ -226,12 +245,40 @@ export default function GarbageTracking() {
       (position) => {
         setUserLocation([position.coords.latitude, position.coords.longitude]);
       },
-      () => {
-        alert("No fue posible obtener tu ubicación.");
+      (error) => {
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            alert(
+              "La ubicación está desactivada o el permiso fue rechazado. " +
+                "Activa el GPS/ubicación de tu dispositivo y permite el acceso a la ubicación para usar esta opción.",
+            );
+            break;
+
+          case error.POSITION_UNAVAILABLE:
+            alert(
+              "No se pudo obtener tu ubicación. " +
+                "Verifica que el GPS o servicio de ubicación esté activado.",
+            );
+            break;
+
+          case error.TIMEOUT:
+            alert(
+              "No se pudo obtener tu ubicación a tiempo. " +
+                "Verifica que el GPS esté activado e inténtalo nuevamente.",
+            );
+            break;
+
+          default:
+            alert(
+              "No fue posible obtener tu ubicación. " +
+                "Verifica que el GPS esté activado.",
+            );
+        }
       },
       {
         enableHighAccuracy: true,
         timeout: 10000,
+        maximumAge: 0,
       },
     );
   };
