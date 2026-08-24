@@ -1,10 +1,11 @@
 "use client";
 import { LocateFixed, Route, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DescriptionGarbage from "./DescriptionGarbage";
 import HeaderSearch from "./HeaderSearch";
 type VehicleStatus = "EN_RUTA" | "DETENIDO" | "FUERA_DE_SERVICIO";
 import dynamic from "next/dynamic";
+import { useSocket } from "@/app/providers/SockerProvider";
 
 export interface Vehicle {
   id: number;
@@ -174,17 +175,13 @@ function calculateDistance(
   lon2: number,
 ) {
   const R = 6371000;
-
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
-
   const dLon = ((lon2 - lon1) * Math.PI) / 180;
-
   const a =
     Math.sin(dLat / 2) ** 2 +
     Math.cos((lat1 * Math.PI) / 180) *
       Math.cos((lat2 * Math.PI) / 180) *
       Math.sin(dLon / 2) ** 2;
-
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
@@ -192,17 +189,33 @@ export default function GarbageTracking() {
   const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(
     VEHICLES[0],
   );
-
   const [userLocation, setUserLocation] = useState<[number, number] | null>(
     null,
   );
 
+  const { socket, connected } = useSocket();
+
+  useEffect(() => {
+    if (!socket) {
+      return;
+    }
+
+    const handleVehiclePosition = (data: any) => {
+      console.log("📍 Posición recibida:", data);
+
+      // Aquí moveremos el marcador
+    };
+
+    socket.on("vehicle:position", handleVehiclePosition);
+
+    return () => {
+      socket.off("vehicle:position", handleVehiclePosition);
+    };
+  }, [socket]);
+
   const [searchOpen, setSearchOpen] = useState(false);
-
   const [search, setSearch] = useState("");
-
   const [showRoutes, setShowRoutes] = useState(true);
-
   const [sheetExpanded, setSheetExpanded] = useState(false);
 
   const activeVehicles = VEHICLES.filter(

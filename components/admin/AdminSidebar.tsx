@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const menu = [
   {
@@ -46,6 +47,24 @@ const menu = [
 export default function AdminSidebar() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("No se pudo cerrar la sesión");
+      }
+
+      window.location.reload();
+    } catch (error) {
+      console.error(error);
+      toast.warning("Ocurrió un error al cerrar sesión");
+    }
+  };
 
   return (
     <aside
@@ -169,7 +188,7 @@ export default function AdminSidebar() {
         <button
           type="button"
           onClick={() => {
-            console.log("Cerrar sesión");
+            handleLogout();
           }}
           title={collapsed ? "Cerrar sesión" : undefined}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-300 transition hover:bg-red-500/10 hover:text-red-400"

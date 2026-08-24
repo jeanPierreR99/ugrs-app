@@ -30,7 +30,7 @@ export default function MonitoringPage() {
         </p>
       </div>
 
-      <div className="grid h-[calc(100vh-180px)] min-h-[600px] grid-cols-1 overflow-hidden rounded-2xl border border-slate-200 bg-white lg:grid-cols-[280px_1fr]">
+      <div className="grid h-[calc(100vh-220px)] min-h-[600px] grid-cols-1 overflow-hidden rounded-2xl border border-slate-200 bg-white lg:grid-cols-[280px_1fr]">
 
         {/* VEHÍCULOS */}
         <aside className="overflow-y-auto border-r border-slate-200 bg-white">

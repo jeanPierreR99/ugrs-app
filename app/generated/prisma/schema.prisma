@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+enum VehicleStatus {
+  EN_RUTA
+  DETENIDO
+}
+
+enum UserRole {
+  ADMIN
+  CONDUCTOR
+  SISTEMA
+}
+
+model User {
+  id       String   @id @default(uuid())
+  name     String
+  lastname String
+  email    String   @unique
+  password String
+  role     UserRole @default(CONDUCTOR)
+  status   Boolean  @default(true)
+
+  vehicles VehicleDriver[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Vehicle {
+  id       String        @id @default(uuid())
+  plate    String        @unique
+  status   VehicleStatus @default(DETENIDO)
+  position String?
+
+  drivers VehicleDriver[]
+  routes  VehicleRoute[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("vehicles")
+}
+
+model VehicleDriver {
+  id        String @id @default(uuid())
+  vehicleId String
+  driverId  String
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  driver  User    @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([vehicleId, driverId])
+  @@index([vehicleId])
+  @@index([driverId])
+  @@map("vehicle_drivers")
+}
+
+model Route {
+  id          String  @id @default(uuid())
+  name        String
+  description String?
+  routePath   Json
+  color       String
+  active      Boolean @default(true)
+
+  vehicles VehicleRoute[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("routes")
+}
+
+model VehicleRoute {
+  id        String @id @default(uuid())
+  vehicleId String
+  routeId   String
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  route   Route   @relation(fields: [routeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([vehicleId, routeId])
+  @@index([vehicleId])
+  @@index([routeId])
+  @@map("vehicle_routes")
+}

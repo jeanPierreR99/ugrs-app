@@ -173,7 +173,6 @@ export default function GarbageMap({
 
       <UserLocation location={userLocation} />
 
-      {/* RUTAS Y VEHÍCULOS */}
       {vehicles.map((vehicle) => (
         <div key={vehicle.id}>
           {showRoutes &&
@@ -227,16 +226,13 @@ export default function GarbageMap({
             }}
           />
 
-          {/* INICIO Y FIN DE LA RUTA */}
           {vehicle.routePath?.length >= 2 && (
             <>
-              {/* INICIO */}
               <Marker
                 position={[vehicle.routePath[0].lat, vehicle.routePath[0].lng]}
                 icon={startIcon}
               />
 
-              {/* FIN */}
               <Marker
                 position={[
                   vehicle.routePath[vehicle.routePath.length - 1].lat,
@@ -249,7 +245,6 @@ export default function GarbageMap({
         </div>
       ))}
 
-      {/* UBICACIÓN DEL USUARIO */}
       {userLocation && (
         <>
           <Circle

@@ -14,6 +14,7 @@ import {
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const [form, setForm] = useState({
     username: "",
@@ -25,18 +26,45 @@ export default function LoginPage() {
     e.preventDefault();
 
     if (!form.username || !form.password) {
+      setError("Rellene todos los campos");
       return;
     }
 
     setLoading(true);
+    setError("");
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email: form.username,
+          password: form.password,
+        }),
+      });
 
-    // Aquí posteriormente conectarás:
-    // POST /api/auth/login
+      const data = await response.json();
+      console.log(data);
+      if (!response.ok) {
+        console.error(data.message);
+        setError(data.message || "Ocurrió un error");
+        return;
+      }
 
-    setTimeout(() => {
+      console.log("Login exitoso:", data.user);
+      setError("");
+
+      if (data.user.role === "ADMIN") {
+        window.location.href = "/admin";
+      }
+    } catch (error) {
+      console.error("Error al iniciar sesión:", error);
+      setError("Ocurrió un error");
+    } finally {
       setLoading(false);
-      console.log(form);
-    }, 1200);
+    }
   };
 
   return (
@@ -181,7 +209,7 @@ export default function LoginPage() {
 
                   <input
                     id="username"
-                    type="text"
+                    type="email"
                     value={form.username}
                     onChange={(e) =>
                       setForm({
@@ -191,20 +219,7 @@ export default function LoginPage() {
                     }
                     placeholder="Ingresa tu usuario"
                     autoComplete="username"
-                    className="
-                      h-13 w-full rounded-xl
-                      border border-slate-200
-                      bg-slate-50
-                      pl-11 pr-4
-                      text-sm text-slate-900
-                      outline-none
-                      transition
-                      placeholder:text-slate-400
-                      focus:border-emerald-500
-                      focus:bg-white
-                      focus:ring-4
-                      focus:ring-emerald-500/10
-                    "
+                    className=" h-13 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"
                   />
                 </div>
               </div>
@@ -236,34 +251,13 @@ export default function LoginPage() {
                     }
                     placeholder="Ingresa tu contraseña"
                     autoComplete="current-password"
-                    className="
-                      h-13 w-full rounded-xl
-                      border border-slate-200
-                      bg-slate-50
-                      pl-11 pr-12
-                      text-sm text-slate-900
-                      outline-none
-                      transition
-                      placeholder:text-slate-400
-                      focus:border-emerald-500
-                      focus:bg-white
-                      focus:ring-4
-                      focus:ring-emerald-500/10
-                    "
+                    className=" h-13 w-full rounded-xl border border-slate-200 bg-slate-50 pl-11 pr-12 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-500/10"
                   />
 
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="
-                      absolute right-3 top-1/2
-                      -translate-y-1/2
-                      rounded-lg p-2
-                      text-slate-400
-                      transition
-                      hover:bg-slate-100
-                      hover:text-slate-600
-                    "
+                    className=" absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
                     aria-label={
                       showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
                     }
@@ -285,13 +279,7 @@ export default function LoginPage() {
                         remember: e.target.checked,
                       })
                     }
-                    className="
-                      h-4 w-4
-                      rounded
-                      border-slate-300
-                      text-emerald-600
-                      focus:ring-emerald-500
-                    "
+                    className=" h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
                   />
 
                   <span className="text-sm text-slate-500">Recordarme</span>
@@ -305,37 +293,21 @@ export default function LoginPage() {
                 </button>
               </div>
 
+              {error && (
+                <p className="text-red-400 text-sm opacity-80 text-center">
+                  {error}
+                </p>
+              )}
+
               {/* Botón */}
               <button
                 type="submit"
                 disabled={loading || !form.username || !form.password}
-                className="
-                  flex h-13 w-full
-                  items-center justify-center
-                  rounded-xl
-                  bg-emerald-600
-                  px-5
-                  text-sm font-bold
-                  text-white
-                  shadow-lg
-                  shadow-emerald-600/20
-                  transition
-                  hover:bg-emerald-700
-                  active:scale-[0.99]
-                  disabled:cursor-not-allowed
-                  disabled:opacity-50
-                "
+                className=" flex h-13 w-full items-center justify-center rounded-xl bg-emerald-600 px-5 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {loading ? (
                   <div className="flex items-center gap-2">
-                    <span
-                      className="
-                        h-4 w-4 animate-spin
-                        rounded-full border-2
-                        border-white/30
-                        border-t-white
-                      "
-                    />
+                    <span className="h-4 w-4 animate-spinrounded-full border-2border-white/30border-t-white" />
                     Ingresando...
                   </div>
                 ) : (
