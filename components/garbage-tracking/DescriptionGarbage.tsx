@@ -181,20 +181,10 @@ const DescriptionGarbage: React.FC<Props> = ({
                 size={24}
                 className={`${selectedVehicle.status != "EN_RUTA" ? "text-red-600" : "text-emerald-600"}`}
               />
-
-              {isActive && (
-                <span
-                  className={`absolute right-0 top-0 h-3 w-3 rounded-full border-2 border-white ${selectedVehicle.status != "EN_RUTA" ? "bg-red-500" : "bg-emerald-500"}`}
-                />
-              )}
             </div>
 
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <h2 className="text-sm font-bold text-slate-900">
-                  {selectedVehicle.code}
-                </h2>
-
                 <span
                   className={`${selectedVehicle.status != "EN_RUTA" ? "text-red-700 bg-red-50" : "text-emerald-700 bg-emerald-50"} flex items-center gap-1 rounded-full  px-2 py-1 text-[9px] font-bold`}
                 >
@@ -295,7 +285,7 @@ const DescriptionGarbage: React.FC<Props> = ({
           <InfoCard
             icon={<Gauge size={17} />}
             label="Velocidad"
-            value={`${selectedVehicle.speed} km/h`}
+            value={`${selectedVehicle.speed.toFixed(2)} km/h`}
             color="text-emerald-600"
           />
 
@@ -309,7 +299,9 @@ const DescriptionGarbage: React.FC<Props> = ({
           <InfoCard
             icon={<Clock3 size={17} />}
             label="Actualizado"
-            value={`${selectedVehicle.updatedAt}s`}
+            value={`${new Date(selectedVehicle.updatedAt).toLocaleDateString("es-PE", {
+  timeZone: "UTC",
+})}`}
             color="text-orange-500"
           />
         </div>

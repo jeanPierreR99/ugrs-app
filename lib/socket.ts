@@ -1,61 +1,38 @@
 import type { Server } from "socket.io";
-import { prisma } from "@/lib/prisma";
 
-export function registerSocketHandlers(io: Server) {
-    io.on("connection", (socket) => {
-        console.log("Cliente conectado:", socket.id);
+declare global {
+    // eslint-disable-next-line no-var
+    var __UGRS_SOCKET_IO__: Server | undefined;
+}
 
-        socket.on("location:update", async (data: any) => {
-            console.log(data)
-            // try {
-            //     console.log("📍 Nueva ubicación:", {
-            //         userId,
-            //         vehicleId,
-            //         routeId,
-            //         coors
-            //     });
+export function setIO(server: Server) {
+    globalThis.__UGRS_SOCKET_IO__ = server;
 
-            //     const vehicleRoute = await prisma.vehicleRoute.findFirst({
-            //         where: {
-            //             vehicleId,
-            //             routeId,
-            //         },
-            //     });
+    console.log("✅ Socket.IO registrado correctamente");
+}
 
-            //     if (!vehicleRoute) {
-            //         socket.emit("location:error", {
-            //             message: "El vehículo no pertenece a esta ruta.",
-            //         });
+export function getIO(): Server | null {
+    if (!globalThis.__UGRS_SOCKET_IO__) {
+        console.log("❌ Socket.IO NO está disponible.");
+        return null;
+    }
 
-            //         return;
-            //     }
+    return globalThis.__UGRS_SOCKET_IO__;
+}
 
-            //     await prisma.vehicle.update({
-            //         where: {
-            //             id: vehicleId,
-            //         },
-            //         data: {
-            //             position: `${coors}`,
-            //         },
-            //     });
+export function registerSocketHandlers(server: Server) {
+    setIO(server);
 
-            //     io.emit("vehicle:position", {
-            //         vehicleId,
-            //         routeId,
-            //         position: coors,
-            //         timestamp: Date.now(),
-            //     });
-            // } catch (error) {
-            //     console.error("Error actualizando ubicación:", error);
-
-            //     socket.emit("location:error", {
-            //         message: "No se pudo actualizar la ubicación.",
-            //     });
-            // }
-        });
+    server.on("connection", (socket) => {
+        console.log("🔌 Cliente conectado:", socket.id);
 
         socket.on("disconnect", (reason) => {
-            console.log("Cliente desconectado:", socket.id, "Motivo:", reason);
+            console.log(
+                "🔌 Cliente desconectado:",
+                socket.id,
+                "Motivo:",
+                reason
+            );
         });
     });
 }

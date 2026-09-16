@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import AdminLayout from "@/components/admin/AdminLayout";
 import VehiclesTable from "./VehiclesTable";
 
+export const dynamic = "force-dynamic";
 export default async function VehiclesPage() {
   const [vehicles, drivers, routes] = await Promise.all([
     prisma.vehicle.findMany({

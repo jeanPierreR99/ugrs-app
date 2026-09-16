@@ -29,7 +29,7 @@ export function SocketProvider({ children }: SocketProviderProps) {
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    const socketInstance = io("http://172.16.1.101:3000", {
+    const socketInstance = io("https://desarrollo.munitambopata.gob.pe", {
       path: "/api/socket",
       transports: ["websocket"],
     });

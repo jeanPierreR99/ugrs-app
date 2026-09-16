@@ -5,6 +5,8 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import StatCard from "@/components/admin/StatCard";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboard() {
   const [
     totalVehicles,
@@ -90,7 +92,6 @@ export default async function AdminDashboard() {
     }),
   ]);
 
-  console.log(vehiclesInOperation);
   return (
     <AdminLayout>
       <div className="mb-8 flex items-center justify-between">
@@ -120,7 +121,7 @@ export default async function AdminDashboard() {
 
         <StatCard
           title="En ruta"
-          value={vehiclesInOperation.length}
+          value={String(vehiclesInOperation.length)}
           description="actualmente"
           icon={Activity}
         />
@@ -161,40 +162,38 @@ export default async function AdminDashboard() {
           </div>
 
           <div className="divide-y divide-slate-100">
-            {vehiclesInOperation.map((vehicle) => {
-              return (
-                <div
-                  key={vehicle.id}
-                  className="flex items-center justify-between p-5"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-xl">
-                      🚛
-                    </div>
-
-                    <div>
-                      <p className="text-sm font-bold text-slate-700">
-                        {vehicle.vehicle.plate}
-                      </p>
-                    </div>
+            {vehiclesInOperation.map((vehicle) => (
+              <div
+                key={vehicle.id}
+                className="flex items-center justify-between p-5"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-xl">
+                    🚛
                   </div>
 
-                  <div className="hidden text-right sm:block">
-                    <p className="text-xs font-semibold text-slate-500">
-                      {vehicle.vehicle.position ?? "-"}
+                  <div>
+                    <p className="text-sm font-bold text-slate-700">
+                      {vehicle.vehicle.plate}
                     </p>
-
-                    <span className="mt-1 inline-flex rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-600">
-                      {vehicle.vehicle.status}
-                    </span>
                   </div>
                 </div>
-              );
-            })}
 
-            {vehicles.length === 0 && (
+                <div className="hidden text-right sm:block">
+                  <p className="text-xs font-semibold text-slate-500">
+                    {vehicle.vehicle.position ?? "-"}
+                  </p>
+
+                  <span className="mt-1 inline-flex rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-600">
+                    {vehicle.vehicle.status}
+                  </span>
+                </div>
+              </div>
+            ))}
+
+            {vehiclesInOperation.length === 0 && (
               <div className="p-8 text-center text-sm text-slate-400">
-                No hay vehículos en oepración.
+                No hay vehículos en operación.
               </div>
             )}
           </div>

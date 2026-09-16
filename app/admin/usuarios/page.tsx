@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import AdminLayout from "@/components/admin/AdminLayout";
 import UsersTable from "./UsersTable";
 
+export const dynamic = "force-dynamic";
 export default async function UsersPage() {
   const users = await prisma.user.findMany({
     select: {

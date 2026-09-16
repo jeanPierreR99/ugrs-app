@@ -43,16 +43,15 @@ function createVehicleIcon(vehicle: Vehicle) {
       <div
         class="relative flex h-14 w-14 items-center justify-center"
       >
-        ${
-          active
-            ? `
+        ${active
+        ? `
               <div
                 class="absolute h-14 w-14 animate-ping rounded-full border opacity-40"
                 style="border-color: ${color};"
               ></div>
             `
-            : ""
-        }
+        : ""
+      }
 
         <div
           class="relative flex h-11 w-11 items-center justify-center rounded-full border-2 bg-white text-xl shadow-lg"
@@ -177,45 +176,62 @@ export default function GarbageMap({
         <div key={vehicle.id}>
           {showRoutes &&
             (() => {
-              const currentIndex = getRouteProgress(vehicle);
+              if (!vehicle.routePath?.length) return null;
 
-              const completedRoute = vehicle.routePath
-                .slice(0, currentIndex + 1)
-                .map(
-                  (point: any) => [point.lat, point.lng] as [number, number],
-                );
-
-              const remainingRoute = vehicle.routePath
-                .slice(currentIndex)
-                .map(
-                  (point: any) => [point.lat, point.lng] as [number, number],
-                );
-
-              return (
-                <>
+              if (vehicle.status !== "EN_RUTA") {
+                return (
                   <Polyline
-                    positions={completedRoute}
+                    positions={vehicle.routePath.map(
+                      (point) => [point.lat, point.lng] as [number, number],
+                    )}
                     pathOptions={{
                       color: vehicle.color,
                       weight: 7,
                       opacity: 1,
                     }}
                   />
+                );
+              }
 
-                  <Polyline
-                    positions={remainingRoute}
-                    pathOptions={{
-                      color: vehicle.color,
-                      weight: 5,
-                      opacity: 0.6,
-                      dashArray: "8 16",
-                    }}
-                  />
+              const currentIndex = getRouteProgress(vehicle);
+
+              const completedRoute = vehicle.routePath
+                .slice(0, currentIndex + 1)
+                .map((point) => [point.lat, point.lng] as [number, number]);
+
+              const remainingRoute = vehicle.routePath
+                .slice(currentIndex)
+                .map((point) => [point.lat, point.lng] as [number, number]);
+
+              return (
+                <>
+                  {completedRoute.length >= 2 && (
+                    <Polyline
+                      positions={completedRoute}
+                      pathOptions={{
+                        color: vehicle.color,
+                        weight: 7,
+                        opacity: 1,
+                      }}
+                    />
+                  )}
+
+                  {remainingRoute.length >= 2 && (
+                    <Polyline
+                      positions={remainingRoute}
+                      pathOptions={{
+                        color: vehicle.color,
+                        weight: 5,
+                        opacity: 0.6,
+                        dashArray: "8 16",
+                      }}
+                    />
+                  )}
                 </>
               );
             })()}
 
-          <Marker
+          {vehicle.status === "EN_RUTA" && <Marker
             position={vehicle.position}
             icon={createVehicleIcon(vehicle)}
             eventHandlers={{
@@ -225,6 +241,7 @@ export default function GarbageMap({
               },
             }}
           />
+          }
 
           {vehicle.routePath?.length >= 2 && (
             <>

@@ -32,7 +32,7 @@ export async function createVehicle(data: VehicleFormData) {
         const vehicle = await prisma.vehicle.create({
             data: {
                 plate,
-
+                position: `${-12.593664},${-69.176848}`,
                 drivers: driverIds.length > 0
                     ? {
                         create: driverIds.map((driverId) => ({
