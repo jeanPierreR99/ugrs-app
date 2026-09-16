@@ -18,7 +18,6 @@ interface GarbageMapProps {
   setSelectedVehicle: (vehicle: Vehicle) => void;
   setSheetExpanded: (value: boolean) => void;
   userLocation: [number, number] | null;
-  showRoutes: boolean;
 }
 
 const iconTracker = L.divIcon({
@@ -151,11 +150,9 @@ function getRouteProgress(vehicle: Vehicle) {
 
 export default function GarbageMap({
   vehicles,
-  selectedVehicle,
   setSelectedVehicle,
   setSheetExpanded,
   userLocation,
-  showRoutes,
 }: GarbageMapProps) {
   return (
     <MapContainer
@@ -172,95 +169,111 @@ export default function GarbageMap({
 
       <UserLocation location={userLocation} />
 
-      {vehicles.map((vehicle) => (
-        <div key={vehicle.id}>
-          {showRoutes &&
-            (() => {
-              if (!vehicle.routePath?.length) return null;
+      {vehicles.map((vehicle, index) => {
+        if (!vehicle.routePath?.length) {
+          return (
+            <div key={index}>
+              {vehicle.status === "EN_RUTA" && (
+                <Marker
+                  position={vehicle.position}
+                  icon={createVehicleIcon(vehicle)}
+                  eventHandlers={{
+                    click: () => {
+                      setSelectedVehicle(vehicle);
+                      setSheetExpanded(true);
+                    },
+                  }}
+                />
+              )}
+            </div>
+          );
+        }
 
-              if (vehicle.status !== "EN_RUTA") {
-                return (
-                  <Polyline
-                    positions={vehicle.routePath.map(
-                      (point) => [point.lat, point.lng] as [number, number],
-                    )}
-                    pathOptions={{
-                      color: vehicle.color,
-                      weight: 7,
-                      opacity: 1,
-                    }}
-                  />
-                );
-              }
+        const routePositions = vehicle.routePath.map(
+          (point) => [point.lat, point.lng] as [number, number],
+        );
 
-              const currentIndex = getRouteProgress(vehicle);
+        return (
+          <div key={index}>
 
-              const completedRoute = vehicle.routePath
-                .slice(0, currentIndex + 1)
-                .map((point) => [point.lat, point.lng] as [number, number]);
-
-              const remainingRoute = vehicle.routePath
-                .slice(currentIndex)
-                .map((point) => [point.lat, point.lng] as [number, number]);
-
-              return (
-                <>
-                  {completedRoute.length >= 2 && (
-                    <Polyline
-                      positions={completedRoute}
-                      pathOptions={{
-                        color: vehicle.color,
-                        weight: 7,
-                        opacity: 1,
-                      }}
-                    />
-                  )}
-
-                  {remainingRoute.length >= 2 && (
-                    <Polyline
-                      positions={remainingRoute}
-                      pathOptions={{
-                        color: vehicle.color,
-                        weight: 5,
-                        opacity: 0.6,
-                        dashArray: "8 16",
-                      }}
-                    />
-                  )}
-                </>
-              );
-            })()}
-
-          {vehicle.status === "EN_RUTA" && <Marker
-            position={vehicle.position}
-            icon={createVehicleIcon(vehicle)}
-            eventHandlers={{
-              click: () => {
-                setSelectedVehicle(vehicle);
-                setSheetExpanded(true);
-              },
-            }}
-          />
-          }
-
-          {vehicle.routePath?.length >= 2 && (
-            <>
-              <Marker
-                position={[vehicle.routePath[0].lat, vehicle.routePath[0].lng]}
-                icon={startIcon}
+            {vehicle.status !== "EN_RUTA" ? (
+              <Polyline
+                positions={routePositions}
+                pathOptions={{
+                  color: vehicle.color,
+                  weight: 7,
+                  opacity: 1,
+                }}
               />
+            ) : (
+              <>
+                {(() => {
+                  const currentIndex = getRouteProgress(vehicle);
+                  const completedRoute = routePositions.slice(
+                    0,
+                    currentIndex + 1,
+                  );
+                  const remainingRoute = routePositions.slice(currentIndex);
 
+                  return (
+                    <>
+                      {completedRoute.length >= 2 && (
+                        <Polyline
+                          positions={completedRoute}
+                          pathOptions={{
+                            color: vehicle.color,
+                            weight: 7,
+                            opacity: 1,
+                          }}
+                        />
+                      )}
+
+                      {remainingRoute.length >= 2 && (
+                        <Polyline
+                          positions={remainingRoute}
+                          pathOptions={{
+                            color: vehicle.color,
+                            weight: 5,
+                            opacity: 0.6,
+                            dashArray: "8 16",
+                          }}
+                        />
+                      )}
+                    </>
+                  );
+                })()}
+              </>
+            )}
+
+            {vehicle.status === "EN_RUTA" && (
               <Marker
-                position={[
-                  vehicle.routePath[vehicle.routePath.length - 1].lat,
-                  vehicle.routePath[vehicle.routePath.length - 1].lng,
-                ]}
-                icon={endIcon}
+                position={vehicle.position}
+                icon={createVehicleIcon(vehicle)}
+                eventHandlers={{
+                  click: () => {
+                    setSelectedVehicle(vehicle);
+                    setSheetExpanded(true);
+                  },
+                }}
               />
-            </>
-          )}
-        </div>
-      ))}
+            )}
+
+            {routePositions.length >= 2 && (
+              <>
+                <Marker
+                  position={routePositions[0]}
+                  icon={startIcon}
+                />
+
+                <Marker
+                  position={routePositions[routePositions.length - 1]}
+                  icon={endIcon}
+                />
+              </>
+            )}
+          </div>
+        );
+      })}
 
       {userLocation && (
         <>

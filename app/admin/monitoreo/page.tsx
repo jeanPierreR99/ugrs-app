@@ -88,7 +88,6 @@ export default function MonitoringPage() {
             setSelectedVehicle={() => {}}
             setSheetExpanded={() => {}}
             userLocation={null}
-            showRoutes={true}
           />
 
           <div className="absolute left-4 top-4 z-[500] rounded-xl bg-white px-4 py-3 shadow-xl">

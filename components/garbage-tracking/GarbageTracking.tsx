@@ -48,8 +48,8 @@ function calculateDistance(
   const a =
     Math.sin(dLat / 2) ** 2 +
     Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) ** 2;
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLon / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
@@ -84,9 +84,9 @@ export default function GarbageTracking() {
         return currentVehicles.map((vehicle) =>
           vehicle.id === data.id
             ? {
-                ...vehicle,
-                ...data,
-              }
+              ...vehicle,
+              ...data,
+            }
             : vehicle,
         );
       });
@@ -112,9 +112,7 @@ export default function GarbageTracking() {
 
   const [searchOpen, setSearchOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [showRoutes, setShowRoutes] = useState(true);
   const [sheetExpanded, setSheetExpanded] = useState(false);
-
   const activeVehicles = vehicles.filter(
     (vehicle) => vehicle.status === "EN_RUTA",
   );
@@ -135,11 +133,11 @@ export default function GarbageTracking() {
   const distance =
     userLocation && selectedVehicle
       ? calculateDistance(
-          userLocation[0],
-          userLocation[1],
-          selectedVehicle.position[0],
-          selectedVehicle.position[1],
-        )
+        userLocation[0],
+        userLocation[1],
+        selectedVehicle.position[0],
+        selectedVehicle.position[1],
+      )
       : null;
 
   const locateUser = () => {
@@ -190,28 +188,23 @@ export default function GarbageTracking() {
   };
 
   useEffect(() => {
-  async function loadVehicles() {
-    try {
-      const response = await fetch("/api/vehicles/map");
+    async function loadVehicles() {
+      try {
+        const response = await fetch("/api/vehicles/map");
+        if (!response.ok) {
+          throw new Error("No se pudieron cargar los vehículos.");
+        }
 
-      if (!response.ok) {
-        throw new Error("No se pudieron cargar los vehículos.");
+        const data: Vehicle[] = await response.json();
+        setVehicles(data);
+
+      } catch (error) {
+        console.error("Error cargando vehículos:", error);
       }
-
-      const data: Vehicle[] = await response.json();
-
-      setVehicles(data);
-
-      if (data.length > 0) {
-        setSelectedVehicle(data[0]);
-      }
-    } catch (error) {
-      console.error("Error cargando vehículos:", error);
     }
-  }
 
-  loadVehicles();
-}, []);
+    loadVehicles();
+  }, []);
 
 
   return (
@@ -222,7 +215,6 @@ export default function GarbageTracking() {
         setSelectedVehicle={setSelectedVehicle}
         setSheetExpanded={setSheetExpanded}
         userLocation={userLocation}
-        showRoutes={showRoutes}
       />
 
       <HeaderSearch
@@ -245,19 +237,12 @@ export default function GarbageTracking() {
         </div>
       </div>
 
-      <div className="absolute bottom-[280px] right-3 z-[9000] flex flex-col gap-2">
-        <button
-          onClick={() => setShowRoutes(!showRoutes)}
-          className={`flex h-12 w-12 items-center justify-center rounded-2xl shadow-xl transition active:scale-95 ${showRoutes ? "bg-emerald-600 text-white" : "bg-white text-slate-700"}`}
-        >
-          <Route size={20} />
-        </button>
-
+      <div className="absolute bottom-[280px] duration-200 hover:scale-105 right-4 z-[9000] flex flex-col gap-2 group">
         <button
           onClick={locateUser}
-          className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-slate-700 shadow-xl transition active:scale-95"
+          className={`flex h-12 w-12 items-center justify-center rounded-full text-slate-700 shadow-xl transition active:scale-95 ${userLocation ? "bg-emerald-500 text-white" : "bg-white"}`}
         >
-          <LocateFixed size={20} />
+          <LocateFixed className="group-hover:rotate-6 duration-200" size={20} />
         </button>
       </div>
 
