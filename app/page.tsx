@@ -1,6 +1,7 @@
 import GarbageTracking from "@/components/garbage-tracking/GarbageTracking";
 import RoutesLegend from "@/components/garbage-tracking/RoutesLegend";
 
+export const dynamic = "force-dynamic";
 export default function Home() {
 
   return (

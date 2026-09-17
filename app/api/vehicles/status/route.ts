@@ -31,61 +31,58 @@ export async function POST(request: NextRequest) {
                 { status: 400 }
             );
         }
-        const vehicle = await prisma.vehicle.findUnique({
+
+        const vehicleRoute = await prisma.vehicleRoute.findUnique({
             where: {
-                id: vehicleId,
+                vehicleId_routeId: {
+                    vehicleId,
+                    routeId,
+                },
             },
             include: {
-                drivers: {
+                vehicle: {
                     include: {
-                        driver: {
-                            select: {
-                                id: true,
-                                name: true,
-                                lastname: true,
+                        drivers: {
+                            include: {
+                                driver: {
+                                    select: {
+                                        id: true,
+                                        name: true,
+                                        lastname: true,
+                                    },
+                                },
                             },
                         },
                     },
                 },
-                routes: {
-                    where: {
-                        routeId,
-                    },
-                    include: {
-                        route: {
-                            select: {
-                                id: true,
-                                name: true,
-                                routePath: true,
-                                color: true,
-                            },
-                        },
+                route: {
+                    select: {
+                        id: true,
+                        name: true,
+                        routePath: true,
+                        color: true,
                     },
                 },
             },
         });
 
-        if (!vehicle) {
+        if (!vehicleRoute) {
             return NextResponse.json(
                 {
                     success: false,
-                    message: "Vehículo no encontrado.",
+                    message: "El vehículo no tiene asignada esta ruta.",
                 },
                 { status: 404 }
             );
         }
 
-        const vehicleRoute = vehicle.routes[0];
+        const vehicle = vehicleRoute.vehicle;
+        const route = vehicleRoute.route;
 
-        if (!vehicleRoute) {
-            return NextResponse.json(
-                {
-                    success: false,
-                    message: "La ruta no está asignada al vehículo.",
-                },
-                { status: 400 }
-            );
-        }
+        console.log("🚛 Vehículo encontrado:", {
+            id: vehicle.id,
+            plate: vehicle.plate,
+        });
 
         const updatedVehicle = await prisma.vehicle.update({
             where: {
@@ -93,6 +90,7 @@ export async function POST(request: NextRequest) {
             },
             data: {
                 status,
+                activeRouteId: status === "EN_RUTA" ? routeId : null,
                 position: `${-12.593664},${-69.176848}`,
             },
         });
@@ -104,17 +102,21 @@ export async function POST(request: NextRequest) {
             code: updatedVehicle.id,
             plate: updatedVehicle.plate,
             driver: driver
-                ? `${driver.name} ${driver.lastname} `
+                ? `${driver.name} ${driver.lastname}`
                 : "Sin conductor",
-            route: vehicleRoute.route.name,
+            route: route.name,
+            routeId: route.id,
             status: updatedVehicle.status,
             speed: 0,
-            position: [-12.593664, -69.176848] as [number, number],
-            routePath: Array.isArray(vehicleRoute.route.routePath)
-                ? vehicleRoute.route.routePath
+            position: [
+                -12.593664,
+                -69.176848,
+            ] as [number, number],
+            routePath: Array.isArray(route.routePath)
+                ? route.routePath
                 : [],
             updatedAt: Date.now(),
-            color: vehicleRoute.route.color,
+            color: route.color,
             heading: 0,
             accuracy: null,
             appState: null,
@@ -136,6 +138,7 @@ export async function POST(request: NextRequest) {
             success: true,
             vehicle: monitoringVehicle,
         });
+
     } catch (error) {
         console.error("❌ Error actualizando estado:", error);
 
@@ -148,4 +151,3 @@ export async function POST(request: NextRequest) {
         );
     }
 }
-

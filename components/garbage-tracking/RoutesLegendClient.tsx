@@ -179,7 +179,7 @@ export default function RoutesLegend({ routes }: Props) {
                                             <div className="mt-1 flex items-start gap-1.5">
                                                 <Clock3 className="mt-[2px] h-3 w-3 shrink-0 text-slate-400" />
 
-                                                <p className="line-clamp-2 whitespace-pre-line text-[10px] leading-relaxed text-slate-500">
+                                                <p className="whitespace-pre-line text-[10px] leading-relaxed text-slate-500">
                                                     {route.description}
                                                 </p>
                                             </div>

@@ -13,34 +13,24 @@ export default async function AdminDashboard() {
     totalRoutes,
     vehiclesInOperation,
     totalUsers,
-    vehicles,
     recentRoutes,
   ] = await Promise.all([
     prisma.vehicle.count(),
 
     prisma.route.count(),
 
-    prisma.vehicleRoute.findMany({
+    prisma.vehicle.findMany({
       where: {
-        vehicle: {
-          position: {
-            not: null,
-          },
-          NOT: {
-            position: "",
-          },
-        },
+        status: "EN_RUTA",
       },
-      include: {
-        vehicle: {
+      select: {
+        id: true,
+        plate: true,
+        position: true,
+        status: true,
+        activeRoute: {
           select: {
-            plate: true,
-            position: true,
-            status: true,
-          },
-        },
-        route: {
-          select: {
+            id: true,
             name: true,
           },
         },
@@ -48,36 +38,6 @@ export default async function AdminDashboard() {
     }),
 
     prisma.user.count(),
-
-    prisma.vehicle.findMany({
-      take: 5,
-      orderBy: {
-        createdAt: "desc",
-      },
-      include: {
-        drivers: {
-          include: {
-            driver: {
-              select: {
-                id: true,
-                name: true,
-                lastname: true,
-              },
-            },
-          },
-        },
-        routes: {
-          include: {
-            route: {
-              select: {
-                id: true,
-                name: true,
-              },
-            },
-          },
-        },
-      },
-    }),
 
     prisma.route.findMany({
       take: 5,
@@ -174,18 +134,21 @@ export default async function AdminDashboard() {
 
                   <div>
                     <p className="text-sm font-bold text-slate-700">
-                      {vehicle.vehicle.plate}
+                      {vehicle.activeRoute?.name}
+                    </p>
+                    <p className="text- text-slate-700">
+                      {vehicle.plate}
                     </p>
                   </div>
                 </div>
 
                 <div className="hidden text-right sm:block">
                   <p className="text-xs font-semibold text-slate-500">
-                    {vehicle.vehicle.position ?? "-"}
+                    {vehicle.position ?? "-"}
                   </p>
 
                   <span className="mt-1 inline-flex rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-600">
-                    {vehicle.vehicle.status}
+                    {vehicle.status}
                   </span>
                 </div>
               </div>

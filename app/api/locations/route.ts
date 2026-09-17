@@ -5,9 +5,6 @@ import { getIO } from "@/lib/socket";
 export async function POST(request: NextRequest) {
     try {
         const data = await request.json();
-
-        console.log(JSON.stringify(data, null, 2));
-
         const {
             userId,
             vehicleId,
@@ -37,21 +34,6 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        console.log("🔎 Datos extraídos:", {
-            userId,
-            vehicleId,
-            routeId,
-            lat,
-            lng,
-            speed,
-            heading,
-            accuracy,
-            timestamp,
-            appState,
-        });
-
-        console.log("🚛 Buscando vehículo:", vehicleId);
-
         const vehicle = await prisma.vehicle.findUnique({
             where: {
                 id: vehicleId,
@@ -71,6 +53,7 @@ export async function POST(request: NextRequest) {
                         },
                     },
                 },
+
                 routes: {
                     where: {
                         routeId,
@@ -104,12 +87,15 @@ export async function POST(request: NextRequest) {
         const driverRelation = vehicle.drivers[0];
 
         if (!driverRelation) {
-            console.log("❌ El conductor no está asociado al vehículo.");
+            console.log(
+                "❌ El conductor no está asociado al vehículo."
+            );
 
             return NextResponse.json(
                 {
                     success: false,
-                    message: "El conductor no está asociado a este vehículo.",
+                    message:
+                        "El conductor no está asociado a este vehículo.",
                 },
                 { status: 403 }
             );
@@ -120,11 +106,15 @@ export async function POST(request: NextRequest) {
         const vehicleRoute = vehicle.routes[0];
 
         if (!vehicleRoute) {
+            console.log(
+                "❌ La ruta no está asignada al vehículo."
+            );
 
             return NextResponse.json(
                 {
                     success: false,
-                    message: "La ruta no está asignada al vehículo.",
+                    message:
+                        "La ruta no está asignada al vehículo.",
                 },
                 { status: 400 }
             );
@@ -132,31 +122,66 @@ export async function POST(request: NextRequest) {
 
         const route = vehicleRoute.route;
 
-        await prisma.vehicle.update({
+        if (vehicle.activeRouteId === null) {
+
+            const activatedVehicle = await prisma.vehicle.update({
+                where: {
+                    id: vehicleId,
+                },
+                data: {
+                    status: "EN_RUTA",
+                    activeRouteId: routeId,
+                },
+            });
+
+            vehicle.status = activatedVehicle.status;
+            vehicle.activeRouteId = activatedVehicle.activeRouteId;
+
+        } else if (vehicle.activeRouteId !== routeId) {
+
+            return NextResponse.json(
+                {
+                    success: false,
+                    message:
+                        "El vehículo ya tiene otra ruta activa.",
+                },
+                { status: 409 }
+            );
+        }
+
+        if (vehicle.status !== "EN_RUTA") {
+            console.log(
+                "❌ El vehículo no está en ruta:",
+                vehicle.status
+            );
+
+            return NextResponse.json(
+                {
+                    success: false,
+                    message:
+                        "El vehículo no se encuentra actualmente en ruta.",
+                },
+                { status: 409 }
+            );
+        }
+
+        const updatedVehicle = await prisma.vehicle.update({
             where: {
                 id: vehicleId,
             },
             data: {
-                status: "EN_RUTA",
                 position: `${lat},${lng}`,
             },
         });
 
-        console.log("✅ Vehículo actualizado:", {
-            id: vehicleId,
-            status: "EN_RUTA",
-            position: `${lat},${lng}`,
-        });
-
         const monitoringVehicle = {
-            id: vehicle.id,
-            code: vehicle.id,
-            plate: vehicle.plate,
-            driver: driver
-                ? `${driver.name} ${driver.lastname}`
-                : "Sin conductor",
+            id: updatedVehicle.id,
+            code: updatedVehicle.id,
+            routeId: route.id,
+            plate: updatedVehicle.plate,
+            driver: `${driver.name} ${driver.lastname}`,
             route: route.name,
-            status: "EN_RUTA" as const,
+            status: updatedVehicle.status,
             speed: speed ?? 0,
             position: [lat, lng] as [number, number],
             routePath: Array.isArray(route.routePath)
@@ -167,28 +192,28 @@ export async function POST(request: NextRequest) {
             heading: heading ?? 0,
             accuracy: accuracy ?? null,
             appState: appState ?? null,
+            activeRouteId: updatedVehicle.activeRouteId,
         };
 
         const io = getIO();
 
         if (io) {
-            console.log("✅ Socket.IO disponible.");
-            console.log("📡 Emitiendo vehicle:position...");
-
             io.emit(
                 "vehicle:position",
                 monitoringVehicle
             );
 
-            console.log("✅ Evento emitido correctamente.");
         } else {
-            console.log("❌ Socket.IO NO está disponible.");
+            console.log(
+                "❌ Socket.IO NO está disponible."
+            );
         }
 
         return NextResponse.json({
             success: true,
             vehicle: monitoringVehicle,
         });
+
     } catch (error) {
         console.error(
             "❌ Error procesando ubicación:",
@@ -198,7 +223,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
             {
                 success: false,
-                message: "Error procesando la ubicación.",
+                message:
+                    "Error procesando la ubicación.",
             },
             { status: 500 }
         );

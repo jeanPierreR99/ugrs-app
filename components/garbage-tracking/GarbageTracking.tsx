@@ -1,27 +1,39 @@
 "use client";
-import { LocateFixed, Route, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { LocateFixed } from "lucide-react";
+import { useEffect, useState } from "react";
 import DescriptionGarbage from "./DescriptionGarbage";
-import HeaderSearch from "./HeaderSearch";
 type VehicleStatus = "EN_RUTA" | "DETENIDO" | "FUERA_DE_SERVICIO";
 import dynamic from "next/dynamic";
 import { useSocket } from "@/app/providers/SockerProvider";
 
 export interface Vehicle {
   id: string;
+  routeId: string;
+
   code: string;
   plate: string;
   driver: string;
   route: string;
+
   status: VehicleStatus;
+
   speed: number;
   position: [number, number];
-  routePath: { lat: number; lng: number }[];
+
+  routePath: {
+    lat: number;
+    lng: number;
+  }[];
+
   updatedAt: number;
+
   color: string;
+
   heading?: number;
   accuracy?: number | null;
   appState?: string | null;
+
+  activeRouteId: string | null;
 }
 
 
@@ -72,24 +84,27 @@ export default function GarbageTracking() {
     const handleVehiclePosition = (data: Vehicle) => {
       console.log("📍 Posición recibida:", data);
 
-      setVehicles((currentVehicles) => {
-        const exists = currentVehicles.some(
-          (vehicle) => vehicle.id === data.id,
-        );
-
-        if (!exists) {
-          return [...currentVehicles, data];
-        }
-
-        return currentVehicles.map((vehicle) =>
-          vehicle.id === data.id
-            ? {
+      setVehicles((currentVehicles) =>
+        currentVehicles.map((vehicle) => {
+          if (vehicle.routeId === data.activeRouteId) {
+            return {
               ...vehicle,
               ...data,
-            }
-            : vehicle,
-        );
-      });
+            };
+          }
+
+          if (vehicle.id === data.id) {
+            return {
+              ...vehicle,
+              status: "DETENIDO",
+              activeRouteId: data.activeRouteId,
+              position: vehicle.position,
+            };
+          }
+
+          return vehicle;
+        }),
+      );
 
       setSelectedVehicle((currentSelected) => {
         if (!currentSelected || currentSelected.id !== data.id) {
@@ -110,25 +125,7 @@ export default function GarbageTracking() {
     };
   }, [socket]);
 
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [search, setSearch] = useState("");
   const [sheetExpanded, setSheetExpanded] = useState(false);
-  const activeVehicles = vehicles.filter(
-    (vehicle) => vehicle.status === "EN_RUTA",
-  );
-
-  const filteredVehicles = useMemo(() => {
-    if (!search.trim()) return vehicles;
-
-    const value = search.toLowerCase();
-
-    return vehicles.filter(
-      (vehicle) =>
-        vehicle.code.toLowerCase().includes(value) ||
-        vehicle.plate.toLowerCase().includes(value) ||
-        vehicle.route.toLowerCase().includes(value),
-    );
-  }, [search, vehicles]);
 
   const distance =
     userLocation && selectedVehicle
@@ -187,6 +184,14 @@ export default function GarbageTracking() {
     );
   };
 
+  const activeVehicles = vehicles.filter(
+    (vehicle) => vehicle.status === "EN_RUTA"
+  );
+
+  const activeVehicleCount = new Set(
+    activeVehicles.map((vehicle) => vehicle.id)
+  ).size;
+
   useEffect(() => {
     async function loadVehicles() {
       try {
@@ -217,22 +222,12 @@ export default function GarbageTracking() {
         userLocation={userLocation}
       />
 
-      <HeaderSearch
-        setSearchOpen={setSearchOpen}
-        searchOpen={searchOpen}
-        search={search}
-        setSearch={setSearch}
-        filteredVehicles={filteredVehicles}
-        setSelectedVehicle={setSelectedVehicle}
-        setSheetExpanded={setSheetExpanded}
-      />
-
-      <div className="absolute left-3 top-[112px] z-[500]">
+      <div className="absolute left-3 top-[12px] z-[500]">
         <div className="flex items-center gap-2 rounded-full bg-white/95 px-3 py-2 shadow-lg backdrop-blur">
           <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
 
           <span className="text-[11px] font-bold text-slate-700">
-            {activeVehicles.length} vehículos en ruta
+            {activeVehicleCount} vehículos en ruta
           </span>
         </div>
       </div>
@@ -248,6 +243,7 @@ export default function GarbageTracking() {
 
       <DescriptionGarbage
         selectedVehicle={selectedVehicle}
+        setSelectedVehicle={setSelectedVehicle}
         setSheetExpanded={setSheetExpanded}
         sheetExpanded={sheetExpanded}
         distance={distance}

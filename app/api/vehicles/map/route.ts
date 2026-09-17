@@ -20,6 +20,7 @@ export async function GET() {
                         },
                     },
                 },
+
                 route: {
                     select: {
                         id: true,
@@ -37,16 +38,20 @@ export async function GET() {
 
             const driver = vehicle.drivers[0]?.driver;
 
-            const position: [number, number] | null = vehicle.position
-                ? vehicle.position.split(",").map(Number) as [number, number]
-                : null;
+            const position: [number, number] | null =
+                vehicle.position
+                    ? (vehicle.position
+                        .split(",")
+                        .map(Number) as [number, number])
+                    : null;
 
             return {
                 id: vehicle.id,
+                routeId: route.id,
                 code: vehicle.id,
                 plate: vehicle.plate,
                 driver: driver
-                    ? `${driver.name} ${driver.lastname} `
+                    ? `${driver.name} ${driver.lastname}`
                     : "Sin conductor",
                 route: route.name,
                 status: vehicle.status,
@@ -62,19 +67,24 @@ export async function GET() {
                 heading: 0,
                 accuracy: null,
                 appState: null,
+                activeRouteId: vehicle.activeRouteId,
             };
         });
 
         return NextResponse.json(vehicles);
+
     } catch (error) {
-        console.error("Error obteniendo vehículos para monitoreo:", error);
+        console.error(
+            "Error obteniendo vehículos para monitoreo:",
+            error
+        );
 
         return NextResponse.json(
             {
                 success: false,
                 message: "No se pudieron obtener los vehículos.",
             },
-            { status: 500 },
+            { status: 500 }
         );
     }
 }

@@ -84,7 +84,11 @@ export default function RoutesForm({ routes }: RoutesFormProps) {
     }
 
     toast.success("Ruta creada exitosamente");
-
+    setForm({
+      name: "",
+      description: "",
+      color: "#10b981"
+    })
     router.refresh();
   };
 

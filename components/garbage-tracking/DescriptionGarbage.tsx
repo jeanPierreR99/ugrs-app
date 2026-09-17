@@ -10,6 +10,7 @@ import {
   Radio,
   Route,
   Truck,
+  X,
 } from "lucide-react";
 import { Vehicle } from "./GarbageTracking";
 import { calculateRouteProgress } from "@/utils/routeUtils";
@@ -20,6 +21,7 @@ interface Props {
   sheetExpanded: boolean;
   distance: number | null;
   locateUser: () => void;
+  setSelectedVehicle: any
 }
 
 interface InfoCardProps {
@@ -50,6 +52,7 @@ const DescriptionGarbage: React.FC<Props> = ({
   sheetExpanded,
   distance,
   locateUser,
+  setSelectedVehicle,
 }) => {
   const SHEET_HEIGHT = 520;
   const CLOSED_OFFSET = 385;
@@ -146,7 +149,6 @@ const DescriptionGarbage: React.FC<Props> = ({
     },
     selectedVehicle.routePath,
   );
-  const isActive = selectedVehicle.status === "EN_RUTA";
   const progress = 1 - translateY / CLOSED_OFFSET;
   const contentOpacity = Math.max(0, Math.min(1, (progress - 0.08) / 0.35));
 
@@ -168,8 +170,21 @@ const DescriptionGarbage: React.FC<Props> = ({
         onPointerCancel={handlePointerCancel}
         className="touch-none select-none cursor-pointer"
       >
-        <div className="flex h-9 items-center justify-center">
+        <div className="relative flex h-9 items-center justify-center">
           <div className="h-1.5 w-12 rounded-full bg-slate-200" />
+
+          <button
+            type="button"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={() => {
+              setSelectedVehicle(null);
+              setSheetExpanded(false);
+            }}
+            className="absolute right-3 flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 hover:text-slate-700 active:scale-95"
+            aria-label="Cerrar información"
+          >
+            <X size={17} />
+          </button>
         </div>
 
         <div className="flex items-center justify-between gap-3 px-4 pb-4">
@@ -239,7 +254,7 @@ const DescriptionGarbage: React.FC<Props> = ({
             <p className="text-[9px] text-slate-400">Ruta asignada</p>
 
             <p className="mt-1 truncate text-xs font-semibold text-slate-800">
-              {selectedVehicle.route} neuva ruta
+              {selectedVehicle.route}
             </p>
           </div>
 
@@ -299,9 +314,11 @@ const DescriptionGarbage: React.FC<Props> = ({
           <InfoCard
             icon={<Clock3 size={17} />}
             label="Actualizado"
-            value={`${new Date(selectedVehicle.updatedAt).toLocaleDateString("es-PE", {
-  timeZone: "UTC",
-})}`}
+            value={new Date(selectedVehicle.updatedAt).toLocaleString("es-PE", {
+              timeZone: "America/Lima",
+              dateStyle: "short",
+              timeStyle: "medium",
+            })}
             color="text-orange-500"
           />
         </div>

@@ -137,6 +137,7 @@ exports.Prisma.VehicleScalarFieldEnum = {
   plate: 'plate',
   status: 'status',
   position: 'position',
+  activeRouteId: 'activeRouteId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -191,7 +192,8 @@ exports.Prisma.NullsOrder = {
 exports.Prisma.VehicleOrderByRelevanceFieldEnum = {
   id: 'id',
   plate: 'plate',
-  position: 'position'
+  position: 'position',
+  activeRouteId: 'activeRouteId'
 };
 
 exports.Prisma.VehicleDriverOrderByRelevanceFieldEnum = {
