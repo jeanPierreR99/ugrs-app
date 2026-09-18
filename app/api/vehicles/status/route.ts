@@ -90,7 +90,8 @@ export async function POST(request: NextRequest) {
             },
             data: {
                 status,
-                activeRouteId: status === "EN_RUTA" ? routeId : null,
+                activeRouteId: null,
+                activeDriverId: null,
                 position: `${-12.593664},${-69.176848}`,
             },
         });

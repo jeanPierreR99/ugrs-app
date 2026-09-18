@@ -122,39 +122,29 @@ export async function POST(request: NextRequest) {
 
         const route = vehicleRoute.route;
 
-        if (vehicle.activeRouteId === null) {
-
-            const activatedVehicle = await prisma.vehicle.update({
-                where: {
-                    id: vehicleId,
-                },
-                data: {
-                    status: "EN_RUTA",
-                    activeRouteId: routeId,
-                },
-            });
-
-            vehicle.status = activatedVehicle.status;
-            vehicle.activeRouteId = activatedVehicle.activeRouteId;
-
-        } else if (vehicle.activeRouteId !== routeId) {
-
+        if (vehicle.activeRouteId !== routeId) {
             return NextResponse.json(
                 {
                     success: false,
                     message:
-                        "El vehículo ya tiene otra ruta activa.",
+                        "El vehículo no tiene activa esta ruta.",
+                },
+                { status: 409 }
+            );
+        }
+
+        if (vehicle.activeDriverId !== userId) {
+            return NextResponse.json(
+                {
+                    success: false,
+                    message:
+                        "El vehículo ya está siendo utilizado por otro conductor.",
                 },
                 { status: 409 }
             );
         }
 
         if (vehicle.status !== "EN_RUTA") {
-            console.log(
-                "❌ El vehículo no está en ruta:",
-                vehicle.status
-            );
-
             return NextResponse.json(
                 {
                     success: false,

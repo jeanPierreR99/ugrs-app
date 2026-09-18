@@ -33,7 +33,7 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/login/admin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

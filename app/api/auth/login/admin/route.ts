@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        if (user.role !== "CONDUCTOR") {
+        if (user.role === "CONDUCTOR") {
             return NextResponse.json(
                 { message: "No tiene autorización" },
                 { status: 401 }

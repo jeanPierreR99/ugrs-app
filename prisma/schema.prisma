@@ -32,6 +32,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  activeVehicles Vehicle[] @relation("ActiveVehicleDriver")
+
   @@map("users")
 }
 
@@ -41,16 +43,18 @@ model Vehicle {
   status   VehicleStatus @default(DETENIDO)
   position String?
 
-  activeRouteId String?
-  activeRoute   Route?  @relation("ActiveVehicleRoute", fields: [activeRouteId], references: [id])
-
-  drivers VehicleDriver[]
-  routes  VehicleRoute[]
+  activeRouteId  String?
+  activeRoute    Route?          @relation("ActiveVehicleRoute", fields: [activeRouteId], references: [id])
+  activeDriverId String?
+  activeDriver   User?           @relation("ActiveVehicleDriver", fields: [activeDriverId], references: [id])
+  drivers        VehicleDriver[]
+  routes         VehicleRoute[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([activeRouteId])
+  @@index([activeDriverId])
   @@map("vehicles")
 }
 

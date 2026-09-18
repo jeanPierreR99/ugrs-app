@@ -1249,10 +1249,12 @@ export namespace Prisma {
 
   export type UserCountOutputType = {
     vehicles: number
+    activeVehicles: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     vehicles?: boolean | UserCountOutputTypeCountVehiclesArgs
+    activeVehicles?: boolean | UserCountOutputTypeCountActiveVehiclesArgs
   }
 
   // Custom InputTypes
@@ -1271,6 +1273,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountVehiclesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: VehicleDriverWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountActiveVehiclesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: VehicleWhereInput
   }
 
 
@@ -1555,6 +1564,7 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     vehicles?: boolean | User$vehiclesArgs<ExtArgs>
+    activeVehicles?: boolean | User$activeVehiclesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -1575,6 +1585,7 @@ export namespace Prisma {
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "lastname" | "email" | "password" | "role" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     vehicles?: boolean | User$vehiclesArgs<ExtArgs>
+    activeVehicles?: boolean | User$activeVehiclesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
 
@@ -1582,6 +1593,7 @@ export namespace Prisma {
     name: "User"
     objects: {
       vehicles: Prisma.$VehicleDriverPayload<ExtArgs>[]
+      activeVehicles: Prisma.$VehiclePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -1934,6 +1946,7 @@ export namespace Prisma {
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     vehicles<T extends User$vehiclesArgs<ExtArgs> = {}>(args?: Subset<T, User$vehiclesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VehicleDriverPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    activeVehicles<T extends User$activeVehiclesArgs<ExtArgs> = {}>(args?: Subset<T, User$activeVehiclesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VehiclePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2344,6 +2357,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.activeVehicles
+   */
+  export type User$activeVehiclesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Vehicle
+     */
+    select?: VehicleSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Vehicle
+     */
+    omit?: VehicleOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: VehicleInclude<ExtArgs> | null
+    where?: VehicleWhereInput
+    orderBy?: VehicleOrderByWithRelationInput | VehicleOrderByWithRelationInput[]
+    cursor?: VehicleWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: VehicleScalarFieldEnum | VehicleScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2378,6 +2415,7 @@ export namespace Prisma {
     status: $Enums.VehicleStatus | null
     position: string | null
     activeRouteId: string | null
+    activeDriverId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2388,6 +2426,7 @@ export namespace Prisma {
     status: $Enums.VehicleStatus | null
     position: string | null
     activeRouteId: string | null
+    activeDriverId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2398,6 +2437,7 @@ export namespace Prisma {
     status: number
     position: number
     activeRouteId: number
+    activeDriverId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -2410,6 +2450,7 @@ export namespace Prisma {
     status?: true
     position?: true
     activeRouteId?: true
+    activeDriverId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2420,6 +2461,7 @@ export namespace Prisma {
     status?: true
     position?: true
     activeRouteId?: true
+    activeDriverId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2430,6 +2472,7 @@ export namespace Prisma {
     status?: true
     position?: true
     activeRouteId?: true
+    activeDriverId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -2513,6 +2556,7 @@ export namespace Prisma {
     status: $Enums.VehicleStatus
     position: string | null
     activeRouteId: string | null
+    activeDriverId: string | null
     createdAt: Date
     updatedAt: Date
     _count: VehicleCountAggregateOutputType | null
@@ -2540,9 +2584,11 @@ export namespace Prisma {
     status?: boolean
     position?: boolean
     activeRouteId?: boolean
+    activeDriverId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     activeRoute?: boolean | Vehicle$activeRouteArgs<ExtArgs>
+    activeDriver?: boolean | Vehicle$activeDriverArgs<ExtArgs>
     drivers?: boolean | Vehicle$driversArgs<ExtArgs>
     routes?: boolean | Vehicle$routesArgs<ExtArgs>
     _count?: boolean | VehicleCountOutputTypeDefaultArgs<ExtArgs>
@@ -2556,13 +2602,15 @@ export namespace Prisma {
     status?: boolean
     position?: boolean
     activeRouteId?: boolean
+    activeDriverId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type VehicleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "plate" | "status" | "position" | "activeRouteId" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicle"]>
+  export type VehicleOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "plate" | "status" | "position" | "activeRouteId" | "activeDriverId" | "createdAt" | "updatedAt", ExtArgs["result"]["vehicle"]>
   export type VehicleInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     activeRoute?: boolean | Vehicle$activeRouteArgs<ExtArgs>
+    activeDriver?: boolean | Vehicle$activeDriverArgs<ExtArgs>
     drivers?: boolean | Vehicle$driversArgs<ExtArgs>
     routes?: boolean | Vehicle$routesArgs<ExtArgs>
     _count?: boolean | VehicleCountOutputTypeDefaultArgs<ExtArgs>
@@ -2572,6 +2620,7 @@ export namespace Prisma {
     name: "Vehicle"
     objects: {
       activeRoute: Prisma.$RoutePayload<ExtArgs> | null
+      activeDriver: Prisma.$UserPayload<ExtArgs> | null
       drivers: Prisma.$VehicleDriverPayload<ExtArgs>[]
       routes: Prisma.$VehicleRoutePayload<ExtArgs>[]
     }
@@ -2581,6 +2630,7 @@ export namespace Prisma {
       status: $Enums.VehicleStatus
       position: string | null
       activeRouteId: string | null
+      activeDriverId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["vehicle"]>
@@ -2924,6 +2974,7 @@ export namespace Prisma {
   export interface Prisma__VehicleClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     activeRoute<T extends Vehicle$activeRouteArgs<ExtArgs> = {}>(args?: Subset<T, Vehicle$activeRouteArgs<ExtArgs>>): Prisma__RouteClient<$Result.GetResult<Prisma.$RoutePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    activeDriver<T extends Vehicle$activeDriverArgs<ExtArgs> = {}>(args?: Subset<T, Vehicle$activeDriverArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     drivers<T extends Vehicle$driversArgs<ExtArgs> = {}>(args?: Subset<T, Vehicle$driversArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VehicleDriverPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     routes<T extends Vehicle$routesArgs<ExtArgs> = {}>(args?: Subset<T, Vehicle$routesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$VehicleRoutePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -2960,6 +3011,7 @@ export namespace Prisma {
     readonly status: FieldRef<"Vehicle", 'VehicleStatus'>
     readonly position: FieldRef<"Vehicle", 'String'>
     readonly activeRouteId: FieldRef<"Vehicle", 'String'>
+    readonly activeDriverId: FieldRef<"Vehicle", 'String'>
     readonly createdAt: FieldRef<"Vehicle", 'DateTime'>
     readonly updatedAt: FieldRef<"Vehicle", 'DateTime'>
   }
@@ -3326,6 +3378,25 @@ export namespace Prisma {
      */
     include?: RouteInclude<ExtArgs> | null
     where?: RouteWhereInput
+  }
+
+  /**
+   * Vehicle.activeDriver
+   */
+  export type Vehicle$activeDriverArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
   }
 
   /**
@@ -6301,6 +6372,7 @@ export namespace Prisma {
     status: 'status',
     position: 'position',
     activeRouteId: 'activeRouteId',
+    activeDriverId: 'activeDriverId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -6380,7 +6452,8 @@ export namespace Prisma {
     id: 'id',
     plate: 'plate',
     position: 'position',
-    activeRouteId: 'activeRouteId'
+    activeRouteId: 'activeRouteId',
+    activeDriverId: 'activeDriverId'
   };
 
   export type VehicleOrderByRelevanceFieldEnum = (typeof VehicleOrderByRelevanceFieldEnum)[keyof typeof VehicleOrderByRelevanceFieldEnum]
@@ -6509,6 +6582,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     vehicles?: VehicleDriverListRelationFilter
+    activeVehicles?: VehicleListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -6522,6 +6596,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     vehicles?: VehicleDriverOrderByRelationAggregateInput
+    activeVehicles?: VehicleOrderByRelationAggregateInput
     _relevance?: UserOrderByRelevanceInput
   }
 
@@ -6539,6 +6614,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     vehicles?: VehicleDriverListRelationFilter
+    activeVehicles?: VehicleListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -6580,9 +6656,11 @@ export namespace Prisma {
     status?: EnumVehicleStatusFilter<"Vehicle"> | $Enums.VehicleStatus
     position?: StringNullableFilter<"Vehicle"> | string | null
     activeRouteId?: StringNullableFilter<"Vehicle"> | string | null
+    activeDriverId?: StringNullableFilter<"Vehicle"> | string | null
     createdAt?: DateTimeFilter<"Vehicle"> | Date | string
     updatedAt?: DateTimeFilter<"Vehicle"> | Date | string
     activeRoute?: XOR<RouteNullableScalarRelationFilter, RouteWhereInput> | null
+    activeDriver?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     drivers?: VehicleDriverListRelationFilter
     routes?: VehicleRouteListRelationFilter
   }
@@ -6593,9 +6671,11 @@ export namespace Prisma {
     status?: SortOrder
     position?: SortOrderInput | SortOrder
     activeRouteId?: SortOrderInput | SortOrder
+    activeDriverId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     activeRoute?: RouteOrderByWithRelationInput
+    activeDriver?: UserOrderByWithRelationInput
     drivers?: VehicleDriverOrderByRelationAggregateInput
     routes?: VehicleRouteOrderByRelationAggregateInput
     _relevance?: VehicleOrderByRelevanceInput
@@ -6610,9 +6690,11 @@ export namespace Prisma {
     status?: EnumVehicleStatusFilter<"Vehicle"> | $Enums.VehicleStatus
     position?: StringNullableFilter<"Vehicle"> | string | null
     activeRouteId?: StringNullableFilter<"Vehicle"> | string | null
+    activeDriverId?: StringNullableFilter<"Vehicle"> | string | null
     createdAt?: DateTimeFilter<"Vehicle"> | Date | string
     updatedAt?: DateTimeFilter<"Vehicle"> | Date | string
     activeRoute?: XOR<RouteNullableScalarRelationFilter, RouteWhereInput> | null
+    activeDriver?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     drivers?: VehicleDriverListRelationFilter
     routes?: VehicleRouteListRelationFilter
   }, "id" | "plate">
@@ -6623,6 +6705,7 @@ export namespace Prisma {
     status?: SortOrder
     position?: SortOrderInput | SortOrder
     activeRouteId?: SortOrderInput | SortOrder
+    activeDriverId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: VehicleCountOrderByAggregateInput
@@ -6639,6 +6722,7 @@ export namespace Prisma {
     status?: EnumVehicleStatusWithAggregatesFilter<"Vehicle"> | $Enums.VehicleStatus
     position?: StringNullableWithAggregatesFilter<"Vehicle"> | string | null
     activeRouteId?: StringNullableWithAggregatesFilter<"Vehicle"> | string | null
+    activeDriverId?: StringNullableWithAggregatesFilter<"Vehicle"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Vehicle"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Vehicle"> | Date | string
   }
@@ -6838,6 +6922,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     vehicles?: VehicleDriverCreateNestedManyWithoutDriverInput
+    activeVehicles?: VehicleCreateNestedManyWithoutActiveDriverInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -6851,6 +6936,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     vehicles?: VehicleDriverUncheckedCreateNestedManyWithoutDriverInput
+    activeVehicles?: VehicleUncheckedCreateNestedManyWithoutActiveDriverInput
   }
 
   export type UserUpdateInput = {
@@ -6864,6 +6950,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     vehicles?: VehicleDriverUpdateManyWithoutDriverNestedInput
+    activeVehicles?: VehicleUpdateManyWithoutActiveDriverNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -6877,6 +6964,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     vehicles?: VehicleDriverUncheckedUpdateManyWithoutDriverNestedInput
+    activeVehicles?: VehicleUncheckedUpdateManyWithoutActiveDriverNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -6923,6 +7011,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     activeRoute?: RouteCreateNestedOneWithoutActiveVehicleInput
+    activeDriver?: UserCreateNestedOneWithoutActiveVehiclesInput
     drivers?: VehicleDriverCreateNestedManyWithoutVehicleInput
     routes?: VehicleRouteCreateNestedManyWithoutVehicleInput
   }
@@ -6933,6 +7022,7 @@ export namespace Prisma {
     status?: $Enums.VehicleStatus
     position?: string | null
     activeRouteId?: string | null
+    activeDriverId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     drivers?: VehicleDriverUncheckedCreateNestedManyWithoutVehicleInput
@@ -6947,6 +7037,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     activeRoute?: RouteUpdateOneWithoutActiveVehicleNestedInput
+    activeDriver?: UserUpdateOneWithoutActiveVehiclesNestedInput
     drivers?: VehicleDriverUpdateManyWithoutVehicleNestedInput
     routes?: VehicleRouteUpdateManyWithoutVehicleNestedInput
   }
@@ -6957,6 +7048,7 @@ export namespace Prisma {
     status?: EnumVehicleStatusFieldUpdateOperationsInput | $Enums.VehicleStatus
     position?: NullableStringFieldUpdateOperationsInput | string | null
     activeRouteId?: NullableStringFieldUpdateOperationsInput | string | null
+    activeDriverId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     drivers?: VehicleDriverUncheckedUpdateManyWithoutVehicleNestedInput
@@ -6969,6 +7061,7 @@ export namespace Prisma {
     status?: $Enums.VehicleStatus
     position?: string | null
     activeRouteId?: string | null
+    activeDriverId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -6988,6 +7081,7 @@ export namespace Prisma {
     status?: EnumVehicleStatusFieldUpdateOperationsInput | $Enums.VehicleStatus
     position?: NullableStringFieldUpdateOperationsInput | string | null
     activeRouteId?: NullableStringFieldUpdateOperationsInput | string | null
+    activeDriverId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -7215,7 +7309,17 @@ export namespace Prisma {
     none?: VehicleDriverWhereInput
   }
 
+  export type VehicleListRelationFilter = {
+    every?: VehicleWhereInput
+    some?: VehicleWhereInput
+    none?: VehicleWhereInput
+  }
+
   export type VehicleDriverOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type VehicleOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -7338,6 +7442,11 @@ export namespace Prisma {
     isNot?: RouteWhereInput | null
   }
 
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
+
   export type VehicleRouteListRelationFilter = {
     every?: VehicleRouteWhereInput
     some?: VehicleRouteWhereInput
@@ -7365,6 +7474,7 @@ export namespace Prisma {
     status?: SortOrder
     position?: SortOrder
     activeRouteId?: SortOrder
+    activeDriverId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -7375,6 +7485,7 @@ export namespace Prisma {
     status?: SortOrder
     position?: SortOrder
     activeRouteId?: SortOrder
+    activeDriverId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -7385,6 +7496,7 @@ export namespace Prisma {
     status?: SortOrder
     position?: SortOrder
     activeRouteId?: SortOrder
+    activeDriverId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -7480,16 +7592,6 @@ export namespace Prisma {
     gt?: InputJsonValue
     gte?: InputJsonValue
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-
-  export type VehicleListRelationFilter = {
-    every?: VehicleWhereInput
-    some?: VehicleWhereInput
-    none?: VehicleWhereInput
-  }
-
-  export type VehicleOrderByRelationAggregateInput = {
-    _count?: SortOrder
   }
 
   export type RouteOrderByRelevanceInput = {
@@ -7599,11 +7701,25 @@ export namespace Prisma {
     connect?: VehicleDriverWhereUniqueInput | VehicleDriverWhereUniqueInput[]
   }
 
+  export type VehicleCreateNestedManyWithoutActiveDriverInput = {
+    create?: XOR<VehicleCreateWithoutActiveDriverInput, VehicleUncheckedCreateWithoutActiveDriverInput> | VehicleCreateWithoutActiveDriverInput[] | VehicleUncheckedCreateWithoutActiveDriverInput[]
+    connectOrCreate?: VehicleCreateOrConnectWithoutActiveDriverInput | VehicleCreateOrConnectWithoutActiveDriverInput[]
+    createMany?: VehicleCreateManyActiveDriverInputEnvelope
+    connect?: VehicleWhereUniqueInput | VehicleWhereUniqueInput[]
+  }
+
   export type VehicleDriverUncheckedCreateNestedManyWithoutDriverInput = {
     create?: XOR<VehicleDriverCreateWithoutDriverInput, VehicleDriverUncheckedCreateWithoutDriverInput> | VehicleDriverCreateWithoutDriverInput[] | VehicleDriverUncheckedCreateWithoutDriverInput[]
     connectOrCreate?: VehicleDriverCreateOrConnectWithoutDriverInput | VehicleDriverCreateOrConnectWithoutDriverInput[]
     createMany?: VehicleDriverCreateManyDriverInputEnvelope
     connect?: VehicleDriverWhereUniqueInput | VehicleDriverWhereUniqueInput[]
+  }
+
+  export type VehicleUncheckedCreateNestedManyWithoutActiveDriverInput = {
+    create?: XOR<VehicleCreateWithoutActiveDriverInput, VehicleUncheckedCreateWithoutActiveDriverInput> | VehicleCreateWithoutActiveDriverInput[] | VehicleUncheckedCreateWithoutActiveDriverInput[]
+    connectOrCreate?: VehicleCreateOrConnectWithoutActiveDriverInput | VehicleCreateOrConnectWithoutActiveDriverInput[]
+    createMany?: VehicleCreateManyActiveDriverInputEnvelope
+    connect?: VehicleWhereUniqueInput | VehicleWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -7636,6 +7752,20 @@ export namespace Prisma {
     deleteMany?: VehicleDriverScalarWhereInput | VehicleDriverScalarWhereInput[]
   }
 
+  export type VehicleUpdateManyWithoutActiveDriverNestedInput = {
+    create?: XOR<VehicleCreateWithoutActiveDriverInput, VehicleUncheckedCreateWithoutActiveDriverInput> | VehicleCreateWithoutActiveDriverInput[] | VehicleUncheckedCreateWithoutActiveDriverInput[]
+    connectOrCreate?: VehicleCreateOrConnectWithoutActiveDriverInput | VehicleCreateOrConnectWithoutActiveDriverInput[]
+    upsert?: VehicleUpsertWithWhereUniqueWithoutActiveDriverInput | VehicleUpsertWithWhereUniqueWithoutActiveDriverInput[]
+    createMany?: VehicleCreateManyActiveDriverInputEnvelope
+    set?: VehicleWhereUniqueInput | VehicleWhereUniqueInput[]
+    disconnect?: VehicleWhereUniqueInput | VehicleWhereUniqueInput[]
+    delete?: VehicleWhereUniqueInput | VehicleWhereUniqueInput[]
+    connect?: VehicleWhereUniqueInput | VehicleWhereUniqueInput[]
+    update?: VehicleUpdateWithWhereUniqueWithoutActiveDriverInput | VehicleUpdateWithWhereUniqueWithoutActiveDriverInput[]
+    updateMany?: VehicleUpdateManyWithWhereWithoutActiveDriverInput | VehicleUpdateManyWithWhereWithoutActiveDriverInput[]
+    deleteMany?: VehicleScalarWhereInput | VehicleScalarWhereInput[]
+  }
+
   export type VehicleDriverUncheckedUpdateManyWithoutDriverNestedInput = {
     create?: XOR<VehicleDriverCreateWithoutDriverInput, VehicleDriverUncheckedCreateWithoutDriverInput> | VehicleDriverCreateWithoutDriverInput[] | VehicleDriverUncheckedCreateWithoutDriverInput[]
     connectOrCreate?: VehicleDriverCreateOrConnectWithoutDriverInput | VehicleDriverCreateOrConnectWithoutDriverInput[]
@@ -7650,10 +7780,30 @@ export namespace Prisma {
     deleteMany?: VehicleDriverScalarWhereInput | VehicleDriverScalarWhereInput[]
   }
 
+  export type VehicleUncheckedUpdateManyWithoutActiveDriverNestedInput = {
+    create?: XOR<VehicleCreateWithoutActiveDriverInput, VehicleUncheckedCreateWithoutActiveDriverInput> | VehicleCreateWithoutActiveDriverInput[] | VehicleUncheckedCreateWithoutActiveDriverInput[]
+    connectOrCreate?: VehicleCreateOrConnectWithoutActiveDriverInput | VehicleCreateOrConnectWithoutActiveDriverInput[]
+    upsert?: VehicleUpsertWithWhereUniqueWithoutActiveDriverInput | VehicleUpsertWithWhereUniqueWithoutActiveDriverInput[]
+    createMany?: VehicleCreateManyActiveDriverInputEnvelope
+    set?: VehicleWhereUniqueInput | VehicleWhereUniqueInput[]
+    disconnect?: VehicleWhereUniqueInput | VehicleWhereUniqueInput[]
+    delete?: VehicleWhereUniqueInput | VehicleWhereUniqueInput[]
+    connect?: VehicleWhereUniqueInput | VehicleWhereUniqueInput[]
+    update?: VehicleUpdateWithWhereUniqueWithoutActiveDriverInput | VehicleUpdateWithWhereUniqueWithoutActiveDriverInput[]
+    updateMany?: VehicleUpdateManyWithWhereWithoutActiveDriverInput | VehicleUpdateManyWithWhereWithoutActiveDriverInput[]
+    deleteMany?: VehicleScalarWhereInput | VehicleScalarWhereInput[]
+  }
+
   export type RouteCreateNestedOneWithoutActiveVehicleInput = {
     create?: XOR<RouteCreateWithoutActiveVehicleInput, RouteUncheckedCreateWithoutActiveVehicleInput>
     connectOrCreate?: RouteCreateOrConnectWithoutActiveVehicleInput
     connect?: RouteWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutActiveVehiclesInput = {
+    create?: XOR<UserCreateWithoutActiveVehiclesInput, UserUncheckedCreateWithoutActiveVehiclesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutActiveVehiclesInput
+    connect?: UserWhereUniqueInput
   }
 
   export type VehicleDriverCreateNestedManyWithoutVehicleInput = {
@@ -7700,6 +7850,16 @@ export namespace Prisma {
     delete?: RouteWhereInput | boolean
     connect?: RouteWhereUniqueInput
     update?: XOR<XOR<RouteUpdateToOneWithWhereWithoutActiveVehicleInput, RouteUpdateWithoutActiveVehicleInput>, RouteUncheckedUpdateWithoutActiveVehicleInput>
+  }
+
+  export type UserUpdateOneWithoutActiveVehiclesNestedInput = {
+    create?: XOR<UserCreateWithoutActiveVehiclesInput, UserUncheckedCreateWithoutActiveVehiclesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutActiveVehiclesInput
+    upsert?: UserUpsertWithoutActiveVehiclesInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutActiveVehiclesInput, UserUpdateWithoutActiveVehiclesInput>, UserUncheckedUpdateWithoutActiveVehiclesInput>
   }
 
   export type VehicleDriverUpdateManyWithoutVehicleNestedInput = {
@@ -8103,6 +8263,40 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type VehicleCreateWithoutActiveDriverInput = {
+    id?: string
+    plate: string
+    status?: $Enums.VehicleStatus
+    position?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    activeRoute?: RouteCreateNestedOneWithoutActiveVehicleInput
+    drivers?: VehicleDriverCreateNestedManyWithoutVehicleInput
+    routes?: VehicleRouteCreateNestedManyWithoutVehicleInput
+  }
+
+  export type VehicleUncheckedCreateWithoutActiveDriverInput = {
+    id?: string
+    plate: string
+    status?: $Enums.VehicleStatus
+    position?: string | null
+    activeRouteId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    drivers?: VehicleDriverUncheckedCreateNestedManyWithoutVehicleInput
+    routes?: VehicleRouteUncheckedCreateNestedManyWithoutVehicleInput
+  }
+
+  export type VehicleCreateOrConnectWithoutActiveDriverInput = {
+    where: VehicleWhereUniqueInput
+    create: XOR<VehicleCreateWithoutActiveDriverInput, VehicleUncheckedCreateWithoutActiveDriverInput>
+  }
+
+  export type VehicleCreateManyActiveDriverInputEnvelope = {
+    data: VehicleCreateManyActiveDriverInput | VehicleCreateManyActiveDriverInput[]
+    skipDuplicates?: boolean
+  }
+
   export type VehicleDriverUpsertWithWhereUniqueWithoutDriverInput = {
     where: VehicleDriverWhereUniqueInput
     update: XOR<VehicleDriverUpdateWithoutDriverInput, VehicleDriverUncheckedUpdateWithoutDriverInput>
@@ -8127,6 +8321,36 @@ export namespace Prisma {
     vehicleId?: StringFilter<"VehicleDriver"> | string
     driverId?: StringFilter<"VehicleDriver"> | string
     createdAt?: DateTimeFilter<"VehicleDriver"> | Date | string
+  }
+
+  export type VehicleUpsertWithWhereUniqueWithoutActiveDriverInput = {
+    where: VehicleWhereUniqueInput
+    update: XOR<VehicleUpdateWithoutActiveDriverInput, VehicleUncheckedUpdateWithoutActiveDriverInput>
+    create: XOR<VehicleCreateWithoutActiveDriverInput, VehicleUncheckedCreateWithoutActiveDriverInput>
+  }
+
+  export type VehicleUpdateWithWhereUniqueWithoutActiveDriverInput = {
+    where: VehicleWhereUniqueInput
+    data: XOR<VehicleUpdateWithoutActiveDriverInput, VehicleUncheckedUpdateWithoutActiveDriverInput>
+  }
+
+  export type VehicleUpdateManyWithWhereWithoutActiveDriverInput = {
+    where: VehicleScalarWhereInput
+    data: XOR<VehicleUpdateManyMutationInput, VehicleUncheckedUpdateManyWithoutActiveDriverInput>
+  }
+
+  export type VehicleScalarWhereInput = {
+    AND?: VehicleScalarWhereInput | VehicleScalarWhereInput[]
+    OR?: VehicleScalarWhereInput[]
+    NOT?: VehicleScalarWhereInput | VehicleScalarWhereInput[]
+    id?: StringFilter<"Vehicle"> | string
+    plate?: StringFilter<"Vehicle"> | string
+    status?: EnumVehicleStatusFilter<"Vehicle"> | $Enums.VehicleStatus
+    position?: StringNullableFilter<"Vehicle"> | string | null
+    activeRouteId?: StringNullableFilter<"Vehicle"> | string | null
+    activeDriverId?: StringNullableFilter<"Vehicle"> | string | null
+    createdAt?: DateTimeFilter<"Vehicle"> | Date | string
+    updatedAt?: DateTimeFilter<"Vehicle"> | Date | string
   }
 
   export type RouteCreateWithoutActiveVehicleInput = {
@@ -8156,6 +8380,37 @@ export namespace Prisma {
   export type RouteCreateOrConnectWithoutActiveVehicleInput = {
     where: RouteWhereUniqueInput
     create: XOR<RouteCreateWithoutActiveVehicleInput, RouteUncheckedCreateWithoutActiveVehicleInput>
+  }
+
+  export type UserCreateWithoutActiveVehiclesInput = {
+    id?: string
+    name: string
+    lastname: string
+    email: string
+    password: string
+    role?: $Enums.UserRole
+    status?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    vehicles?: VehicleDriverCreateNestedManyWithoutDriverInput
+  }
+
+  export type UserUncheckedCreateWithoutActiveVehiclesInput = {
+    id?: string
+    name: string
+    lastname: string
+    email: string
+    password: string
+    role?: $Enums.UserRole
+    status?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    vehicles?: VehicleDriverUncheckedCreateNestedManyWithoutDriverInput
+  }
+
+  export type UserCreateOrConnectWithoutActiveVehiclesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutActiveVehiclesInput, UserUncheckedCreateWithoutActiveVehiclesInput>
   }
 
   export type VehicleDriverCreateWithoutVehicleInput = {
@@ -8237,6 +8492,43 @@ export namespace Prisma {
     vehicles?: VehicleRouteUncheckedUpdateManyWithoutRouteNestedInput
   }
 
+  export type UserUpsertWithoutActiveVehiclesInput = {
+    update: XOR<UserUpdateWithoutActiveVehiclesInput, UserUncheckedUpdateWithoutActiveVehiclesInput>
+    create: XOR<UserCreateWithoutActiveVehiclesInput, UserUncheckedCreateWithoutActiveVehiclesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutActiveVehiclesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutActiveVehiclesInput, UserUncheckedUpdateWithoutActiveVehiclesInput>
+  }
+
+  export type UserUpdateWithoutActiveVehiclesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    lastname?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    status?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vehicles?: VehicleDriverUpdateManyWithoutDriverNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutActiveVehiclesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    lastname?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    status?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    vehicles?: VehicleDriverUncheckedUpdateManyWithoutDriverNestedInput
+  }
+
   export type VehicleDriverUpsertWithWhereUniqueWithoutVehicleInput = {
     where: VehicleDriverWhereUniqueInput
     update: XOR<VehicleDriverUpdateWithoutVehicleInput, VehicleDriverUncheckedUpdateWithoutVehicleInput>
@@ -8287,6 +8579,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     activeRoute?: RouteCreateNestedOneWithoutActiveVehicleInput
+    activeDriver?: UserCreateNestedOneWithoutActiveVehiclesInput
     routes?: VehicleRouteCreateNestedManyWithoutVehicleInput
   }
 
@@ -8296,6 +8589,7 @@ export namespace Prisma {
     status?: $Enums.VehicleStatus
     position?: string | null
     activeRouteId?: string | null
+    activeDriverId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     routes?: VehicleRouteUncheckedCreateNestedManyWithoutVehicleInput
@@ -8316,6 +8610,7 @@ export namespace Prisma {
     status?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    activeVehicles?: VehicleCreateNestedManyWithoutActiveDriverInput
   }
 
   export type UserUncheckedCreateWithoutVehiclesInput = {
@@ -8328,6 +8623,7 @@ export namespace Prisma {
     status?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    activeVehicles?: VehicleUncheckedCreateNestedManyWithoutActiveDriverInput
   }
 
   export type UserCreateOrConnectWithoutVehiclesInput = {
@@ -8354,6 +8650,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     activeRoute?: RouteUpdateOneWithoutActiveVehicleNestedInput
+    activeDriver?: UserUpdateOneWithoutActiveVehiclesNestedInput
     routes?: VehicleRouteUpdateManyWithoutVehicleNestedInput
   }
 
@@ -8363,6 +8660,7 @@ export namespace Prisma {
     status?: EnumVehicleStatusFieldUpdateOperationsInput | $Enums.VehicleStatus
     position?: NullableStringFieldUpdateOperationsInput | string | null
     activeRouteId?: NullableStringFieldUpdateOperationsInput | string | null
+    activeDriverId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     routes?: VehicleRouteUncheckedUpdateManyWithoutVehicleNestedInput
@@ -8389,6 +8687,7 @@ export namespace Prisma {
     status?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activeVehicles?: VehicleUpdateManyWithoutActiveDriverNestedInput
   }
 
   export type UserUncheckedUpdateWithoutVehiclesInput = {
@@ -8401,6 +8700,7 @@ export namespace Prisma {
     status?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activeVehicles?: VehicleUncheckedUpdateManyWithoutActiveDriverNestedInput
   }
 
   export type VehicleRouteCreateWithoutRouteInput = {
@@ -8432,6 +8732,7 @@ export namespace Prisma {
     position?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    activeDriver?: UserCreateNestedOneWithoutActiveVehiclesInput
     drivers?: VehicleDriverCreateNestedManyWithoutVehicleInput
     routes?: VehicleRouteCreateNestedManyWithoutVehicleInput
   }
@@ -8441,6 +8742,7 @@ export namespace Prisma {
     plate: string
     status?: $Enums.VehicleStatus
     position?: string | null
+    activeDriverId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     drivers?: VehicleDriverUncheckedCreateNestedManyWithoutVehicleInput
@@ -8489,19 +8791,6 @@ export namespace Prisma {
     data: XOR<VehicleUpdateManyMutationInput, VehicleUncheckedUpdateManyWithoutActiveRouteInput>
   }
 
-  export type VehicleScalarWhereInput = {
-    AND?: VehicleScalarWhereInput | VehicleScalarWhereInput[]
-    OR?: VehicleScalarWhereInput[]
-    NOT?: VehicleScalarWhereInput | VehicleScalarWhereInput[]
-    id?: StringFilter<"Vehicle"> | string
-    plate?: StringFilter<"Vehicle"> | string
-    status?: EnumVehicleStatusFilter<"Vehicle"> | $Enums.VehicleStatus
-    position?: StringNullableFilter<"Vehicle"> | string | null
-    activeRouteId?: StringNullableFilter<"Vehicle"> | string | null
-    createdAt?: DateTimeFilter<"Vehicle"> | Date | string
-    updatedAt?: DateTimeFilter<"Vehicle"> | Date | string
-  }
-
   export type VehicleCreateWithoutRoutesInput = {
     id?: string
     plate: string
@@ -8510,6 +8799,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     activeRoute?: RouteCreateNestedOneWithoutActiveVehicleInput
+    activeDriver?: UserCreateNestedOneWithoutActiveVehiclesInput
     drivers?: VehicleDriverCreateNestedManyWithoutVehicleInput
   }
 
@@ -8519,6 +8809,7 @@ export namespace Prisma {
     status?: $Enums.VehicleStatus
     position?: string | null
     activeRouteId?: string | null
+    activeDriverId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     drivers?: VehicleDriverUncheckedCreateNestedManyWithoutVehicleInput
@@ -8577,6 +8868,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     activeRoute?: RouteUpdateOneWithoutActiveVehicleNestedInput
+    activeDriver?: UserUpdateOneWithoutActiveVehiclesNestedInput
     drivers?: VehicleDriverUpdateManyWithoutVehicleNestedInput
   }
 
@@ -8586,6 +8878,7 @@ export namespace Prisma {
     status?: EnumVehicleStatusFieldUpdateOperationsInput | $Enums.VehicleStatus
     position?: NullableStringFieldUpdateOperationsInput | string | null
     activeRouteId?: NullableStringFieldUpdateOperationsInput | string | null
+    activeDriverId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     drivers?: VehicleDriverUncheckedUpdateManyWithoutVehicleNestedInput
@@ -8632,6 +8925,16 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type VehicleCreateManyActiveDriverInput = {
+    id?: string
+    plate: string
+    status?: $Enums.VehicleStatus
+    position?: string | null
+    activeRouteId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type VehicleDriverUpdateWithoutDriverInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -8648,6 +8951,40 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     vehicleId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type VehicleUpdateWithoutActiveDriverInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    plate?: StringFieldUpdateOperationsInput | string
+    status?: EnumVehicleStatusFieldUpdateOperationsInput | $Enums.VehicleStatus
+    position?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activeRoute?: RouteUpdateOneWithoutActiveVehicleNestedInput
+    drivers?: VehicleDriverUpdateManyWithoutVehicleNestedInput
+    routes?: VehicleRouteUpdateManyWithoutVehicleNestedInput
+  }
+
+  export type VehicleUncheckedUpdateWithoutActiveDriverInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    plate?: StringFieldUpdateOperationsInput | string
+    status?: EnumVehicleStatusFieldUpdateOperationsInput | $Enums.VehicleStatus
+    position?: NullableStringFieldUpdateOperationsInput | string | null
+    activeRouteId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    drivers?: VehicleDriverUncheckedUpdateManyWithoutVehicleNestedInput
+    routes?: VehicleRouteUncheckedUpdateManyWithoutVehicleNestedInput
+  }
+
+  export type VehicleUncheckedUpdateManyWithoutActiveDriverInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    plate?: StringFieldUpdateOperationsInput | string
+    status?: EnumVehicleStatusFieldUpdateOperationsInput | $Enums.VehicleStatus
+    position?: NullableStringFieldUpdateOperationsInput | string | null
+    activeRouteId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type VehicleDriverCreateManyVehicleInput = {
@@ -8709,6 +9046,7 @@ export namespace Prisma {
     plate: string
     status?: $Enums.VehicleStatus
     position?: string | null
+    activeDriverId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -8738,6 +9076,7 @@ export namespace Prisma {
     position?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    activeDriver?: UserUpdateOneWithoutActiveVehiclesNestedInput
     drivers?: VehicleDriverUpdateManyWithoutVehicleNestedInput
     routes?: VehicleRouteUpdateManyWithoutVehicleNestedInput
   }
@@ -8747,6 +9086,7 @@ export namespace Prisma {
     plate?: StringFieldUpdateOperationsInput | string
     status?: EnumVehicleStatusFieldUpdateOperationsInput | $Enums.VehicleStatus
     position?: NullableStringFieldUpdateOperationsInput | string | null
+    activeDriverId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     drivers?: VehicleDriverUncheckedUpdateManyWithoutVehicleNestedInput
@@ -8758,6 +9098,7 @@ export namespace Prisma {
     plate?: StringFieldUpdateOperationsInput | string
     status?: EnumVehicleStatusFieldUpdateOperationsInput | $Enums.VehicleStatus
     position?: NullableStringFieldUpdateOperationsInput | string | null
+    activeDriverId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
