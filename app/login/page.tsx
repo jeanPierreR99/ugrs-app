@@ -46,19 +46,18 @@ export default function LoginPage() {
       });
 
       const data = await response.json();
-      console.log(data);
       if (!response.ok) {
         console.error(data.message);
         setError(data.message || "Ocurrió un error");
         return;
       }
 
-      console.log("Login exitoso:", data.user);
       setError("");
 
       if (data.user.role === "ADMIN") {
         window.location.href = "/admin";
       }
+
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
       setError("Ocurrió un error");

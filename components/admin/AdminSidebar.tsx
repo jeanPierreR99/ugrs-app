@@ -44,9 +44,16 @@ const menu = [
   },
 ];
 
-export default function AdminSidebar() {
+interface AdminSidebarProps {
+  collapse: boolean;
+  setCollapse: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function AdminSidebar({
+  collapse,
+  setCollapse,
+}: AdminSidebarProps) {
   const pathname = usePathname();
-  const [collapsed, setCollapsed] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -68,9 +75,8 @@ export default function AdminSidebar() {
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-white/10 bg-emerald-900 text-white shadow-2xl shadow-black/20 transition-all duration-300 ${
-        collapsed ? "w-[78px]" : "w-[260px]"
-      }`}
+      className={`fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-white/10 bg-emerald-900 text-white shadow-2xl shadow-black/20 transition-all duration-300 ${collapse ? "w-[78px]" : "w-[260px]"
+        }`}
     >
       {/* LOGO */}
       <div className="flex flex-col gap-4 mt-10 h-[120px] justify-center items-center border-b border-white/10 px-5">
@@ -79,7 +85,7 @@ export default function AdminSidebar() {
             <img src="/logo-solo.png" alt="" />
           </div>
 
-          {!collapsed && (
+          {!collapse && (
             <div>
               <p className="text-sm font-bold tracking-wide text-white">
                 MUNICIPALIDAD PROVINCIAL
@@ -89,7 +95,7 @@ export default function AdminSidebar() {
           )}
         </div>
 
-        {!collapsed && (
+        {!collapse && (
           <div className="min-w-0">
             <p className=" text-[10px] font-medium text-center uppercase tracking-[0.18em] text-emerald-400">
               Sistema de Gestión de residuos Sólidos
@@ -100,7 +106,7 @@ export default function AdminSidebar() {
 
       {/* TÍTULO DEL MENÚ */}
       <div className="px-5 pt-6">
-        {!collapsed && (
+        {!collapse && (
           <p className="mb-3 px-2 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-300">
             Administración
           </p>
@@ -120,37 +126,32 @@ export default function AdminSidebar() {
             <Link
               key={item.href}
               href={item.href}
-              title={collapsed ? item.title : undefined}
-              className={`group relative flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-all duration-200 ${
-                active
-                  ? "bg-emerald-500/10 text-emerald-400"
-                  : "text-slate-300 hover:bg-white/[0.04] hover:text-white"
-              }`}
+              title={collapse ? item.title : undefined}
+              className={`group relative flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition-all duration-200 ${active
+                ? "bg-emerald-500/10 text-emerald-400"
+                : "text-slate-300 hover:bg-white/[0.04] hover:text-white"
+                }`}
             >
-              {/* INDICADOR ACTIVO */}
               {active && (
                 <span className="absolute left-0 h-7 w-1 rounded-r-full bg-emerald-500" />
               )}
 
-              {/* ICONO */}
               <div
-                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition ${
-                  active
-                    ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
-                    : "bg-white/[0.04] text-slate-500 group-hover:bg-white/[0.07] group-hover:text-slate-300"
-                }`}
+                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg transition ${active
+                  ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/20"
+                  : "bg-white/[0.04] text-slate-500 group-hover:bg-white/[0.07] group-hover:text-slate-300"
+                  }`}
               >
                 <Icon size={18} />
               </div>
 
-              {!collapsed && <span className="truncate">{item.title}</span>}
+              {!collapse && <span className="truncate">{item.title}</span>}
             </Link>
           );
         })}
       </nav>
 
-      {/* ESTADO DEL SISTEMA */}
-      {!collapsed && (
+      {!collapse && (
         <div className="mx-3 mb-3 rounded-xl border border-white/10 bg-white/[0.03] p-3">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2.5 w-2.5">
@@ -169,47 +170,30 @@ export default function AdminSidebar() {
         </div>
       )}
 
-      {/* PARTE INFERIOR */}
       <div className="space-y-1 border-t border-white/10 p-3">
-        {/* CONFIGURACIÓN */}
-        <Link
-          href="/admin/configuracion"
-          title={collapsed ? "Configuración" : undefined}
-          className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-300 transition hover:bg-white/[0.04] hover:text-white"
-        >
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/[0.04]">
-            <Settings size={18} />
-          </div>
-
-          {!collapsed && <span>Configuración</span>}
-        </Link>
-
-        {/* CERRAR SESIÓN */}
         <button
           type="button"
           onClick={() => {
             handleLogout();
           }}
-          title={collapsed ? "Cerrar sesión" : undefined}
+          title={collapse ? "Cerrar sesión" : undefined}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-slate-300 transition hover:bg-red-500/10 hover:text-red-400"
         >
           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/[0.04]">
             <LogOut size={18} />
           </div>
 
-          {!collapsed && <span>Cerrar sesión</span>}
+          {!collapse && <span>Cerrar sesión</span>}
         </button>
 
-        {/* SEPARADOR */}
         <div className="py-1" />
 
-        {/* COLAPSAR SIDEBAR */}
         <button
           type="button"
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={() => setCollapse(!collapse)}
           className="flex w-full items-center justify-center rounded-xl border border-white/10 bg-white/[0.02] py-2 text-slate-300 transition hover:bg-white/[0.05] hover:text-white"
         >
-          {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          {collapse ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
         </button>
       </div>
     </aside>

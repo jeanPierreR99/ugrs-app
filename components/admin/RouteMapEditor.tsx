@@ -137,7 +137,7 @@ export default function RouteMapEditor({
   };
 
   return (
-    <div className="relative h-full overflow-hidden rounded-2xl border border-slate-200 bg-white">
+    <div className="relative min-h-150 overflow-hidden rounded-2xl border border-slate-200 bg-white">
       <MapContainer
         center={[-12.593, -69.189]}
         zoom={15}

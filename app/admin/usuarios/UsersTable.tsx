@@ -1,11 +1,11 @@
 "use client";
 
-import { Plus, Search, X } from "lucide-react";
+import { Pencil, Plus, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type UserFormData, userSchema } from "./user.schema";
-import { createUser } from "./actions";
+import { createUser, updateUser } from "./actions";
 import { toast } from "sonner";
 
 interface User {
@@ -13,7 +13,7 @@ interface User {
   name: string;
   lastname: string;
   email: string;
-  role: string;
+  role: "ADMIN" | "CONDUCTOR" | "SISTEMA";
   status: boolean;
 }
 
@@ -26,6 +26,7 @@ export default function UsersTable({ users }: UsersTableProps) {
   const [search, setSearch] = useState("");
   const [showCreate, setShowCreate] = useState(false);
   const [serverError, setServerError] = useState("");
+  const [editingUser, setEditingUser] = useState<User | null>(null);
 
   const {
     register,
@@ -40,6 +41,7 @@ export default function UsersTable({ users }: UsersTableProps) {
       email: "",
       password: "",
       role: "CONDUCTOR",
+      status: true
     },
   });
 
@@ -54,6 +56,30 @@ export default function UsersTable({ users }: UsersTableProps) {
   });
 
   const onSubmit = async (data: UserFormData) => {
+    setServerError("");
+
+    if (editingUser) {
+      const result = await updateUser(editingUser.id, data);
+
+      if (!result.success) {
+        setServerError(result.message);
+        toast.warning(result.message);
+        return;
+      }
+
+      setUsersList((currentUsers) =>
+        currentUsers.map((user) =>
+          user.id === editingUser.id ? result.user! : user
+        )
+      );
+
+      toast.success("Usuario actualizado exitosamente");
+
+      handleCloseModal();
+
+      return;
+    }
+
     const result = await createUser(data);
 
     if (!result.success) {
@@ -63,15 +89,53 @@ export default function UsersTable({ users }: UsersTableProps) {
     }
 
     setUsersList((currentUsers) => [result.user, ...currentUsers]);
+
     toast.success("Usuario creado exitosamente");
-    handleCloseCreate();
+
+    handleCloseModal();
   };
 
-  const handleCloseCreate = () => {
+  /**
+   * ABRIR MODAL PARA CREAR
+   */
+  const handleOpenCreate = () => {
+    setEditingUser(null);
+
+    reset({
+      name: "",
+      lastname: "",
+      email: "",
+      password: "",
+      role: "CONDUCTOR",
+      status: true,
+    });
+
+    setServerError("");
+    setShowCreate(true);
+  };
+
+  const handleOpenEdit = (user: User) => {
+    setEditingUser(user);
+
+    reset({
+      name: user.name,
+      lastname: user.lastname,
+      email: user.email,
+      password: "",
+      role: user.role,
+      status: user.status
+    });
+
+    setServerError("");
+    setShowCreate(true);
+  };
+
+  const handleCloseModal = () => {
     if (isSubmitting) return;
 
     reset();
     setServerError("");
+    setEditingUser(null);
     setShowCreate(false);
   };
 
@@ -81,9 +145,12 @@ export default function UsersTable({ users }: UsersTableProps) {
 
   return (
     <>
+      {/* HEADER */}
       <div className="mb-7 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-800">Usuarios</h1>
+          <h1 className="text-2xl font-extrabold text-slate-800">
+            Usuarios
+          </h1>
 
           <p className="mt-1 text-sm text-slate-400">
             Administra los usuarios que tienen acceso al sistema.
@@ -92,11 +159,7 @@ export default function UsersTable({ users }: UsersTableProps) {
 
         <button
           type="button"
-          onClick={() => {
-            reset();
-            setServerError("");
-            setShowCreate(true);
-          }}
+          onClick={handleOpenCreate}
           className="flex items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-700"
         >
           <Plus size={18} />
@@ -104,7 +167,9 @@ export default function UsersTable({ users }: UsersTableProps) {
         </button>
       </div>
 
+      {/* TABLA */}
       <div className="rounded-2xl border border-slate-200 bg-white">
+        {/* SEARCH */}
         <div className="border-b border-slate-100 p-5">
           <div className="relative max-w-md">
             <Search
@@ -122,6 +187,7 @@ export default function UsersTable({ users }: UsersTableProps) {
           </div>
         </div>
 
+        {/* TABLE */}
         <div className="overflow-x-auto">
           <table className="w-full min-w-[700px]">
             <thead>
@@ -150,10 +216,11 @@ export default function UsersTable({ users }: UsersTableProps) {
                   key={user.id}
                   className="border-b border-slate-100 last:border-0 hover:bg-slate-50/50"
                 >
+                  {/* USER */}
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-700">
-                        {`${user.name[0] ?? ""}${user.lastname[0] ?? ""}`.toUpperCase()}
+                        {`${user.name[0] ?? ""}${user.lastname[0] ?? ""} `.toUpperCase()}
                       </div>
 
                       <div>
@@ -161,15 +228,27 @@ export default function UsersTable({ users }: UsersTableProps) {
                           {user.name} {user.lastname}
                         </p>
 
-                        <p className="text-xs text-slate-400">{user.email}</p>
+                        <p className="text-xs text-slate-400">
+                          {user.email}
+                        </p>
                       </div>
                     </div>
                   </td>
 
-                  <td className="px-5 py-4 text-sm text-slate-500">
-                    {user.role}
+                  {/* ROLE */}
+                  <td className="px-5 py-4">
+                    <span
+                      className={
+                        user.role !== "ADMIN"
+                          ? "rounded-full bg-cyan-50 px-3 py-1 text-[10px] font-bold text-cyan-600"
+                          : "rounded-full bg-blue-50 px-3 py-1 text-[10px] font-bold text-blue-500"
+                      }
+                    >
+                      {user.role}
+                    </span>
                   </td>
 
+                  {/* STATUS */}
                   <td className="px-5 py-4">
                     <span
                       className={
@@ -182,13 +261,16 @@ export default function UsersTable({ users }: UsersTableProps) {
                     </span>
                   </td>
 
+                  {/* ACTIONS */}
                   <td className="px-5 py-4">
                     <div className="flex justify-end gap-2">
                       <button
+                        title="Editar usuario"
                         type="button"
-                        className="rounded-lg p-2 text-slate-400 hover:bg-slate-100"
+                        onClick={() => handleOpenEdit(user)}
+                        className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
                       >
-                        ...
+                        <Pencil size={18} />
                       </button>
                     </div>
                   </td>
@@ -199,29 +281,35 @@ export default function UsersTable({ users }: UsersTableProps) {
         </div>
       </div>
 
+      {/* MODAL CREATE / EDIT */}
       {showCreate && (
         <>
+          {/* OVERLAY */}
           <div
             className="fixed inset-0 z-40 animate-[fadeIn_200ms_ease-out] bg-black/30"
-            onClick={handleCloseCreate}
+            onClick={handleCloseModal}
           />
 
+          {/* DRAWER */}
           <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md animate-[slideIn_250ms_ease-out] bg-white shadow-2xl">
             <div className="flex h-full flex-col">
+              {/* HEADER */}
               <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
                 <div>
                   <h2 className="text-lg font-extrabold text-slate-800">
-                    Nuevo usuario
+                    {editingUser ? "Editar usuario" : "Nuevo usuario"}
                   </h2>
 
                   <p className="mt-1 text-sm text-slate-400">
-                    Registra un nuevo usuario para el sistema.
+                    {editingUser
+                      ? "Actualiza la información del usuario."
+                      : "Registra un nuevo usuario para el sistema."}
                   </p>
                 </div>
 
                 <button
                   type="button"
-                  onClick={handleCloseCreate}
+                  onClick={handleCloseModal}
                   disabled={isSubmitting}
                   className="rounded-lg p-2 text-slate-400 hover:bg-slate-100 disabled:opacity-50"
                 >
@@ -229,18 +317,21 @@ export default function UsersTable({ users }: UsersTableProps) {
                 </button>
               </div>
 
+              {/* ERROR */}
               {serverError && (
                 <div className="mx-6 mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
                   {serverError}
                 </div>
               )}
 
+              {/* FORM */}
               <div className="flex-1 overflow-y-auto p-6">
                 <form
-                  id="create-user-form"
+                  id="user-form"
                   onSubmit={handleSubmit(onSubmit)}
                   className="space-y-5"
                 >
+                  {/* NAME */}
                   <div>
                     <label className="mb-2 block text-sm font-bold text-slate-700">
                       Nombre
@@ -264,6 +355,7 @@ export default function UsersTable({ users }: UsersTableProps) {
                     )}
                   </div>
 
+                  {/* LASTNAME */}
                   <div>
                     <label className="mb-2 block text-sm font-bold text-slate-700">
                       Apellidos
@@ -287,6 +379,7 @@ export default function UsersTable({ users }: UsersTableProps) {
                     )}
                   </div>
 
+                  {/* EMAIL */}
                   <div>
                     <label className="mb-2 block text-sm font-bold text-slate-700">
                       Correo electrónico
@@ -310,15 +403,25 @@ export default function UsersTable({ users }: UsersTableProps) {
                     )}
                   </div>
 
+                  {/* PASSWORD */}
                   <div>
                     <label className="mb-2 block text-sm font-bold text-slate-700">
                       Contraseña
+                      {editingUser && (
+                        <span className="ml-2 text-xs font-normal text-slate-400">
+                          (opcional)
+                        </span>
+                      )}
                     </label>
 
                     <input
                       {...register("password")}
                       type="password"
-                      placeholder="••••••••"
+                      placeholder={
+                        editingUser
+                          ? "Dejar vacío para conservarla"
+                          : "••••••••"
+                      }
                       className={
                         errors.password
                           ? "h-11 w-full rounded-xl border border-red-300 bg-red-50 px-4 text-sm outline-none focus:border-red-500"
@@ -329,6 +432,38 @@ export default function UsersTable({ users }: UsersTableProps) {
                     {errors.password && (
                       <p className="mt-1.5 text-xs font-medium text-red-500">
                         {errors.password.message}
+                      </p>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="mb-2 block text-sm font-bold text-slate-700">
+                      Estado
+                    </label>
+
+                    <select
+                      {...register("status", {
+                        setValueAs: (value) => value === "true",
+                      })}
+                      className={
+                        errors.status
+                          ? "h-11 w-full rounded-xl border border-red-300 bg-red-50 px-4 text-sm outline-none focus:border-red-500"
+                          : "h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none focus:border-emerald-500"
+                      }
+                    >
+                      <option value="true">Activo</option>
+                      <option value="false">Inactivo</option>
+                    </select>
+
+                    {errors.status && (
+                      <p className="mt-1.5 text-xs font-medium text-red-500">
+                        {errors.status.message}
+                      </p>
+                    )}
+
+                    {errors.role && (
+                      <p className="mt-1.5 text-xs font-medium text-red-500">
+                        {errors.role.message}
                       </p>
                     )}
                   </div>
@@ -359,10 +494,11 @@ export default function UsersTable({ users }: UsersTableProps) {
                 </form>
               </div>
 
+              {/* FOOTER */}
               <div className="flex gap-3 border-t border-slate-100 p-6">
                 <button
                   type="button"
-                  onClick={handleCloseCreate}
+                  onClick={handleCloseModal}
                   disabled={isSubmitting}
                   className="flex-1 rounded-xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 disabled:opacity-50"
                 >
@@ -371,11 +507,17 @@ export default function UsersTable({ users }: UsersTableProps) {
 
                 <button
                   type="submit"
-                  form="create-user-form"
+                  form="user-form"
                   disabled={isSubmitting}
                   className="flex-1 rounded-xl bg-emerald-600 px-4 py-3 text-sm font-bold text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {isSubmitting ? "Creando..." : "Crear usuario"}
+                  {isSubmitting
+                    ? editingUser
+                      ? "Guardando..."
+                      : "Creando..."
+                    : editingUser
+                      ? "Guardar cambios"
+                      : "Crear usuario"}
                 </button>
               </div>
             </div>
